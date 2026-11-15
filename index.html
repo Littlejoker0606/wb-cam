@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="only light">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <title>旺邦營造 · 現場出工連拍</title>
+  <title>旺邦營造 · 現場出工與鼠患稽查連拍</title>
   <style>
     :root, html, body {
       color-scheme: only light !important;
@@ -16,19 +16,20 @@
     * { box-sizing: border-box; font-family: "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, sans-serif; }
 
     body {
-      margin: 0; padding: 14px;
+      margin: 0; padding: 12px;
       background-color: #F4F2EC;
       color: #2C3A31;
       display: flex; flex-direction: column; align-items: center;
+      justify-content: center;
       min-height: 100vh;
     }
 
     .card {
-      width: 100%; max-width: 430px;
+      width: 100%; max-width: 440px;
       background-color: #FFFFFF;
       background-size: cover;
       border-radius: 26px;
-      padding: 18px; margin-bottom: 14px;
+      padding: 18px; margin-bottom: 12px;
       box-shadow: 0 10px 24px rgba(145, 160, 150, 0.25);
       border: 1.5px solid #E2EBE2;
       position: relative;
@@ -44,48 +45,73 @@
     .dot-orange { width: 11px; height: 11px; border-radius: 50%; background: #F6BC7E; }
     .dot-blue { width: 11px; height: 11px; border-radius: 50%; background: #88C4E6; }
 
-    h2 { margin: 4px 0 16px 0; font-size: 21px; text-align: center; color: #243529; font-weight: 800; }
-    label.sec-title { font-size: 14px; font-weight: bold; color: #435949; display: block; margin-bottom: 8px; }
+    h2 { margin: 2px 0 14px 0; font-size: 21px; text-align: center; color: #243529; font-weight: 800; }
+    label.sec-title { font-size: 14px; font-weight: bold; color: #3D5243; display: block; margin-bottom: 6px; }
 
     select, input[type="text"] {
-      width: 100%; padding: 14px 16px; font-size: 20px; font-weight: bold;
+      width: 100%; padding: 13px 16px; font-size: 19px; font-weight: bold;
       color: #243529; background-color: #FFFFFF;
       background-size: cover;
       border: 2px solid #CFE3CE; border-radius: 30px;
       box-shadow: 0 4px 12px rgba(120, 145, 125, 0.15);
-      outline: none; text-align: center; margin-bottom: 14px;
+      outline: none; text-align: center; margin-bottom: 12px;
+    }
+
+    /* 內層分區盒 */
+    .sub-box {
+      background: rgba(255, 255, 255, 0.65);
+      border: 1.5px solid #CFE4CE;
+      border-radius: 22px;
+      padding: 14px;
+      margin-bottom: 14px;
     }
 
     .shift-pill {
-      width: 100%; padding: 12px; border-radius: 25px; text-align: center;
+      width: 100%; padding: 11px; border-radius: 25px; text-align: center;
       font-weight: bold; font-size: 15px; cursor: pointer;
       background-color: #FFF9EC; background-size: cover; color: #435747;
-      border: 2px solid #EBD7B5; margin-bottom: 18px;
+      border: 2px solid #EBD7B5; margin-top: 4px;
       user-select: none;
     }
     .shift-pill.night {
       background-color: #4A6274; color: #FFFFFF; border-color: #394E5E;
     }
 
-    /* 拍攝頁頂部廠商資訊橫幅 */
+    /* 拍攝頁頂部資訊橫幅 */
     .Current-vendor-banner {
       background-color: #EEF7EE; background-size: cover;
-      border: 2px solid #C5E0C6; border-radius: 18px;
-      padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 12px;
+      border: 2px solid #C5E0C6; border-radius: 16px;
+      padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 10px; gap: 6px;
     }
-    .vendor-big-name { font-size: 19px; font-weight: 900; color: #2B5434; }
+    .vendor-big-name { font-size: 17px; font-weight: 900; color: #2B5434; }
     .shot-counter-badge {
-      padding: 4px 12px; background-color: #FFFFFF; background-size: cover;
-      border-radius: 20px; font-size: 14px; font-weight: bold; color: #D97925;
-      border: 1px solid #F0D2B5;
+      padding: 4px 10px; background-color: #FFFFFF; background-size: cover;
+      border-radius: 18px; font-size: 13px; font-weight: bold; color: #D97925;
+      border: 1px solid #F0D2B5; white-space: nowrap;
+    }
+    .rotate-btn {
+      padding: 5px 10px; background-color: #E2F0F9; color: #24526E;
+      border-radius: 16px; font-size: 12px; font-weight: bold;
+      border: 1px solid #B5D7EC; cursor: pointer; white-space: nowrap;
     }
 
-    /* 常駐不關閉的網頁內嵌即時相機鏡頭 */
+    /* ================= 橫式相機佈局 (支援手機橫拿與強制橫向模式) ================= */
+    .shooting-layout {
+      display: flex; flex-direction: column; width: 100%;
+    }
+    .camera-left-col {
+      width: 100%;
+    }
+    .controls-right-col {
+      width: 100%; display: flex; flex-direction: column;
+    }
+
+    /* 4:3 標準橫式取景框 */
     #cameraContainer {
-      width: 100%; border-radius: 20px; overflow: hidden;
+      width: 100%; border-radius: 18px; overflow: hidden;
       background: #1E2420; position: relative;
-      margin-bottom: 12px; border: 2px solid #B8D8B7;
+      margin-bottom: 10px; border: 2.5px solid #9LC49E;
       aspect-ratio: 4 / 3;
       display: flex; align-items: center; justify-content: center;
     }
@@ -96,141 +122,214 @@
       position: absolute; top: 0; left: 0; right: 0; bottom: 0;
       background: #FFFFFF; opacity: 0; pointer-events: none; transition: opacity 0.12s;
     }
+    .landscape-guide {
+      position: absolute; bottom: 8px; right: 10px;
+      background: rgba(0, 0, 0, 0.55); color: #FFFFFF;
+      font-size: 11px; padding: 3px 8px; border-radius: 8px;
+      pointer-events: none;
+    }
+
+    /* 當手機橫拿 (Landscape) 時，自動切換為「左鏡頭、右快門」橫向相機介面！ */
+    @media (orientation: landscape) {
+      body { padding: 6px; }
+      #pageShooting.card {
+        max-width: 98vw; height: 94vh; padding: 12px 16px; margin: 0;
+        display: flex; flex-direction: column; justify-content: center;
+      }
+      .shooting-layout {
+        flex-direction: row; gap: 14px; align-items: center; height: calc(100% - 48px);
+      }
+      .camera-left-col {
+        flex: 1.35; height: 100%; display: flex; align-items: center; justify-content: center;
+      }
+      #cameraContainer {
+        margin-bottom: 0; max-height: 100%; width: auto; height: 100%; aspect-ratio: 4 / 3;
+      }
+      .controls-right-col {
+        flex: 1; height: 100%; justify-content: center; overflow-y: auto;
+      }
+    }
+
+    /* 若手機鎖定直向，點選「強制橫向介面」時旋轉畫面 90 度 */
+    body.force-landscape #pageShooting {
+      position: fixed; top: 50%; left: 50%;
+      width: 94vh; height: 94vw; max-width: none;
+      transform: translate(-50%, -50%) rotate(90deg);
+      z-index: 999; margin: 0; padding: 12px 16px;
+      display: flex; flex-direction: column;
+    }
+    body.force-landscape .shooting-layout {
+      flex-direction: row; gap: 14px; align-items: center; height: calc(100% - 48px);
+    }
+    body.force-landscape .camera-left-col {
+      flex: 1.35; height: 100%; display: flex; align-items: center; justify-content: center;
+    }
+    body.force-landscape #cameraContainer {
+      margin-bottom: 0; height: 100%; width: auto; aspect-ratio: 4 / 3;
+    }
+    body.force-landscape .controls-right-col {
+      flex: 1; height: 100%; justify-content: center;
+    }
 
     /* 暖杏橘色超大快門按鈕 */
     .btn-orange-huge {
-      width: 100%; padding: 20px 16px; border-radius: 32px; border: none;
+      width: 100%; padding: 18px 14px; border-radius: 30px; border: none;
       background: linear-gradient(135deg, #FAD09C 0%, #F0A35E 100%);
       background-size: cover;
-      color: #FFFFFF; font-size: 21px; font-weight: bold;
+      color: #FFFFFF; font-size: 20px; font-weight: bold;
       text-shadow: 0 1px 3px rgba(150, 75, 15, 0.35);
-      box-shadow: 0 8px 18px rgba(240, 163, 94, 0.45);
-      cursor: pointer; margin-bottom: 10px; display: block; text-align: center;
+      box-shadow: 0 7px 16px rgba(240, 163, 94, 0.45);
+      cursor: pointer; margin-bottom: 8px; display: block; text-align: center;
       user-select: none;
     }
     .btn-orange-huge:active { transform: scale(0.96); }
 
-    /* 嫩芽綠「確認這組工班拍攝結束」大按鈕 */
+    /* 嫩芽綠「確認拍攝結束」大按鈕 */
     .btn-finish-group {
-      width: 100%; padding: 16px; border-radius: 28px;
+      width: 100%; padding: 14px; border-radius: 26px;
       border: 2px solid #78AD80;
       background: linear-gradient(135deg, #A8D4AD 0%, #7BB383 100%);
       background-size: cover;
-      color: #FFFFFF; font-size: 18px; font-weight: bold;
+      color: #FFFFFF; font-size: 17px; font-weight: bold;
       text-shadow: 0 1px 2px rgba(40, 90, 50, 0.3);
-      box-shadow: 0 6px 14px rgba(123, 179, 131, 0.38);
+      box-shadow: 0 5px 12px rgba(123, 179, 131, 0.38);
       cursor: pointer; display: block; text-align: center;
-      margin-bottom: 10px; user-select: none;
+      margin-bottom: 8px; user-select: none;
     }
     .btn-finish-group:active { transform: scale(0.98); }
 
     /* 晴空粉藍相簿多選按鈕 */
     .btn-blue-sub {
-      width: 100%; padding: 11px; border-radius: 24px; border: none;
+      width: 100%; padding: 10px; border-radius: 22px; border: none;
       background: linear-gradient(135deg, #C6E7F7 0%, #9BCDE6 100%);
       background-size: cover;
-      color: #1F4457; font-size: 14px; font-weight: bold;
+      color: #1F4457; font-size: 13px; font-weight: bold;
       cursor: pointer; display: block; text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     /* 已拍照片縮圖列 */
     .thumb-strip {
-      display: flex; gap: 8px; overflow-x: auto; padding: 4px 0;
-      margin-bottom: 8px; min-height: 6px;
+      display: flex; gap: 6px; overflow-x: auto; padding: 2px 0;
+      margin-bottom: 6px; min-height: 4px;
     }
     .thumb-item {
-      width: 64px; height: 64px; border-radius: 10px; object-fit: cover;
+      width: 64px; height: 48px; border-radius: 8px; object-fit: cover;
       border: 2px solid #88B88E; flex-shrink: 0;
     }
 
     .status-box {
-      font-size: 13px; font-weight: bold; text-align: center;
-      padding: 10px; border-radius: 14px;
+      font-size: 12px; font-weight: bold; text-align: center;
+      padding: 8px; border-radius: 12px;
       background-color: #F0F7F0; background-size: cover; color: #356640;
       border: 1px solid #CDE3CF;
     }
-    .log-list { font-size: 12px; color: #3A6644; margin-top: 8px; line-height: 1.6; max-height: 90px; overflow-y: auto; }
+    .log-list { font-size: 11px; color: #3A6644; margin-top: 6px; line-height: 1.5; max-height: 65px; overflow-y: auto; }
     input[type="file"] { display: none; }
   </style>
 </head>
 <body>
 
-  <!-- ================= 【第一頁：廠商選擇頁面】 ================= -->
+  <!-- ================= 【第一頁：選擇拍攝類別與廠商頁面】 ================= -->
   <div id="pageSelectVendor" class="card card-hero">
     <div class="dots"><div class="dot-orange"></div><div class="dot-blue"></div></div>
-    <h2>旺邦營造 · 現場出工拍照</h2>
+    <h2>旺邦營造 · 現場拍照系統</h2>
 
-    <label class="sec-title">1. 請選擇要拍攝的出工廠商</label>
-    <select id="vendorSelect" onchange="onVendorChange()">
-      <option value="弘佾">弘佾</option>
-      <option value="上承">上承</option>
-      <option value="井帝">井帝</option>
-      <option value="天盛">天盛</option>
-      <option value="全暐">全暐</option>
-      <option value="昇萌">昇萌</option>
-      <option value="長和">長和</option>
-      <option value="春豐">春豐</option>
-      <option value="時勝">時勝</option>
-      <option value="海納">海納</option>
-      <option value="勝順">勝順</option>
-      <option value="筌幄">筌幄</option>
-      <option value="源鴻">源鴻</option>
-      <option value="鼎創">鼎創</option>
-      <option value="樹花園">樹花園</option>
-      <option value="燕銘">燕銘</option>
-      <option value="鎮遠">鎮遠</option>
-      <option value="繽紛">繽紛</option>
-      <option value="__CUSTOM__">➕ 手動輸入其他廠商...</option>
+    <!-- 1. 選擇拍攝種類（工班出工 vs 鼠患檢查） -->
+    <label class="sec-title">1. 請選擇拍攝類別</label>
+    <select id="photoTypeSelect" onchange="onPhotoTypeChange()">
+      <option value="WORKER">👷 拍攝工班出工照片 (危害告知)</option>
+      <option value="RAT">🐭 拍攝鼠患檢查照片 (環境稽查)</option>
     </select>
 
-    <input type="text" id="customVendorInput" placeholder="請輸入新廠商名稱" style="display:none;">
+    <!-- 2A. 工班出工專屬設定區 (選鼠患時自動隱藏) -->
+    <div id="workerConfigBox" class="sub-box">
+      <label class="sec-title">2. 請選擇要拍攝的出工廠商</label>
+      <select id="vendorSelect" onchange="onVendorChange()">
+        <option value="弘佾">弘佾</option>
+        <option value="上承">上承</option>
+        <option value="井帝">井帝</option>
+        <option value="天盛">天盛</option>
+        <option value="全暐">全暐</option>
+        <option value="昇萌">昇萌</option>
+        <option value="長和">長和</option>
+        <option value="春豐">春豐</option>
+        <option value="時勝">時勝</option>
+        <option value="海納">海納</option>
+        <option value="勝順">勝順</option>
+        <option value="筌幄">筌幄</option>
+        <option value="源鴻">源鴻</option>
+        <option value="鼎創">鼎創</option>
+        <option value="樹花園">樹花園</option>
+        <option value="燕銘">燕銘</option>
+        <option value="鎮遠">鎮遠</option>
+        <option value="繽紛">繽紛</option>
+        <option value="__CUSTOM__">➕ 手動輸入其他廠商...</option>
+      </select>
 
-    <div id="shiftBtn" class="shift-pill" onclick="toggleShift()">☀️ 目前模式：日班 (點此切換夜班)</div>
+      <input type="text" id="customVendorInput" placeholder="請輸入新廠商名稱" style="display:none;">
+      <div id="shiftBtn" class="shift-pill" onclick="toggleShift()">☀️ 目前模式：日班 (點此切換夜班)</div>
+    </div>
 
-    <div id="btnStartShoot" class="btn-orange-huge" onclick="startGroupShooting()">📷 開始拍攝這組工班</div>
+    <!-- 2B. 鼠患檢查說明區 (選鼠患時顯示，免選廠商) -->
+    <div id="ratConfigBox" class="sub-box" style="display:none; text-align:center;">
+      <div style="font-size:17px; font-weight:bold; color:#2B5434; margin-bottom:6px;">🐭 鼠患防治環境稽查模式</div>
+      <div style="font-size:13px; color:#4A6350; line-height:1.5;">
+        免選廠商！進入相機後可在同一地點連拍幾張，<br>接著直接走到下一地點繼續拍，AI 會自動分類地點！
+      </div>
+    </div>
+
+    <div id="btnStartShoot" class="btn-orange-huge" onclick="startGroupShooting()">📷 開始拍攝這組工班 (橫式)</div>
   </div>
 
-  <!-- ================= 【第二頁：常駐鏡頭不跳轉連拍介面】 ================= -->
+  <!-- ================= 【第二頁：橫向常駐鏡頭連拍介面】 ================= -->
   <div id="pageShooting" class="card" style="display:none;">
     <div id="vendorBanner" class="Current-vendor-banner">
-      <div id="shootingVendorTitle" class="vendor-big-name">👷 全暐 (日班)</div>
-      <div id="shotCounterText" class="shot-counter-badge">📸 已拍 0 張</div>
+      <div id="shootingVendorTitle" class="vendor-big-name">👷 弘佾 (日班)</div>
+      <div style="display:flex; gap:6px; align-items:center;">
+        <div id="shotCounterText" class="shot-counter-badge">📸 已拍 0 張</div>
+        <div class="rotate-btn" onclick="toggleForceLandscape()">🔄 橫向介面</div>
+      </div>
     </div>
 
-    <!-- 常駐開啟的相機取景框 (連按快門完全不關閉、不跳轉！) -->
-    <div id="cameraContainer">
-      <video id="cameraVideo" autoplay playsinline muted></video>
-      <div id="flashOverlay"></div>
+    <div class="shooting-layout">
+      <!-- 左側：4:3 橫式即時相機鏡頭 -->
+      <div class="camera-left-col">
+        <div id="cameraContainer">
+          <video id="cameraVideo" autoplay playsinline muted></video>
+          <div id="flashOverlay"></div>
+          <div class="landscape-guide">📐 4:3 橫式照片輸出</div>
+        </div>
+      </div>
+
+      <!-- 右側：快門、結束按鈕與縮圖狀態 -->
+      <div class="controls-right-col">
+        <div id="thumbStrip" class="thumb-strip"></div>
+
+        <div id="shutterBtn" class="btn-orange-huge" onclick="takeInstantShot()">
+          📸 按下快門連拍 (拍第 1 張)
+        </div>
+
+        <div id="btnFinishGroup" class="btn-finish-group" onclick="finishGroupAndReturn()">
+          ✅ 確認這組工班拍攝結束 (返回)
+        </div>
+
+        <label id="btnGallerySub" class="btn-blue-sub" for="galleryInput">🖼️ 或從相簿勾選橫式照片上傳</label>
+        <input type="file" id="galleryInput" accept="image/*" multiple onchange="handleGalleryFiles(this.files)">
+
+        <div id="statusBox" class="status-box">🟢 手機橫拿或直接按快門，自動存為 4:3 橫式照！</div>
+        <div id="logList" class="log-list"></div>
+      </div>
     </div>
-
-    <!-- 剛拍的照片縮圖預覽列 -->
-    <div id="thumbStrip" class="thumb-strip"></div>
-
-    <!-- 超大快門按鈕：點一下直接拍並背景上傳，鏡頭維持開啟！ -->
-    <div id="shutterBtn" class="btn-orange-huge" onclick="takeInstantShot()">
-      📸 按下快門拍照 (拍第 1 張)
-    </div>
-
-    <!-- 確認這組工班拍攝結束返回按鈕 -->
-    <div id="btnFinishGroup" class="btn-finish-group" onclick="finishGroupAndReturn()">
-      ✅ 確認這組工班拍攝結束 (返回選廠商)
-    </div>
-
-    <!-- 備用：從相簿多選 -->
-    <label id="btnGallerySub" class="btn-blue-sub" for="galleryInput">🖼️ 或從手機相簿勾選照片上傳</label>
-    <input type="file" id="galleryInput" accept="image/*" multiple onchange="handleGalleryFiles(this.files)">
-
-    <div id="statusBox" class="status-box">🟢 對準工班直接按橘色快門即可連拍！</div>
-    <div id="logList" class="log-list"></div>
   </div>
 
   <canvas id="watermarkCanvas" style="display:none;"></canvas>
 
   <script>
-    // ✅ 已自動填入您專屬的 Google Apps Script 網址
+    // ✅ 已填入您專屬的 Google Apps Script 網址
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxRi29SB802ZJSssGKp8Ki6-g-dx3VvVVkMO857_kum88V-FC2KhEqCj4IZKMPcYQcn/exec";
 
+    let currentPhotoType = "WORKER"; // "WORKER" (工班) 或 "RAT" (鼠患)
     let isNightMode = false;
     let currentGroupShots = 0;
     let groupBaseEpochMs = null;
@@ -253,6 +352,7 @@
       document.body.style.backgroundImage = makeGradientPng("#F4F2EC", "#F4F2EC");
       document.getElementById("pageSelectVendor").style.backgroundImage = makeGradientPng("#D2EBD0", "#C2E5F5");
       document.getElementById("pageShooting").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
+      document.getElementById("photoTypeSelect").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
       document.getElementById("vendorSelect").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
       document.getElementById("shiftBtn").style.backgroundImage = makeGradientPng("#FFF9EC", "#FFF9EC");
       document.getElementById("btnStartShoot").style.backgroundImage = makeGradientPng("#FAD09C", "#F0A35E");
@@ -277,6 +377,24 @@
         }
       }
     };
+
+    // 切換「拍攝工班」或「拍攝鼠患」
+    function onPhotoTypeChange() {
+      currentPhotoType = document.getElementById("photoTypeSelect").value;
+      const workerBox = document.getElementById("workerConfigBox");
+      const ratBox = document.getElementById("ratConfigBox");
+      const startBtn = document.getElementById("btnStartShoot");
+
+      if (currentPhotoType === "RAT") {
+        workerBox.style.display = "none";
+        ratBox.style.display = "block";
+        startBtn.innerText = "📷 開始拍攝鼠患檢查照片 (橫式)";
+      } else {
+        workerBox.style.display = "block";
+        ratBox.style.display = "none";
+        startBtn.innerText = "📷 開始拍攝這組工班 (橫式)";
+      }
+    }
 
     function onVendorChange() {
       const val = document.getElementById("vendorSelect").value;
@@ -304,7 +422,13 @@
       }
     }
 
+    // 手動切換強制橫向介面 (當手機鎖定直向時也能一鍵變橫向操作)
+    function toggleForceLandscape() {
+      document.body.classList.toggle("force-landscape");
+    }
+
     function getSelectedVendor() {
+      if (currentPhotoType === "RAT") return "鼠患檢查";
       const sel = document.getElementById("vendorSelect").value;
       if (sel === "__CUSTOM__") {
         return document.getElementById("customVendorInput").value.trim();
@@ -312,7 +436,6 @@
       return sel;
     }
 
-    // 啟動內嵌後置鏡頭
     async function startGroupShooting() {
       const vendor = getSelectedVendor();
       if (!vendor) {
@@ -323,12 +446,25 @@
       groupBaseEpochMs = Date.now();
       document.getElementById("thumbStrip").innerHTML = "";
 
-      const shiftStr = isNightMode ? "夜班" : "日班";
-      document.getElementById("shootingVendorTitle").innerText = `👷 ${vendor} (${shiftStr})`;
+      if (currentPhotoType === "RAT") {
+        document.getElementById("shootingVendorTitle").innerText = "🐭 鼠患防治檢查";
+        document.getElementById("btnFinishGroup").innerText = "✅ 鼠患檢查拍攝結束 (返回首頁)";
+      } else {
+        const shiftStr = isNightMode ? "夜班" : "日班";
+        document.getElementById("shootingVendorTitle").innerText = `👷 ${vendor} (${shiftStr})`;
+        document.getElementById("btnFinishGroup").innerText = "✅ 確認這組工班拍攝結束 (返回選廠商)";
+      }
       updateShootingUI();
 
       document.getElementById("pageSelectVendor").style.display = "none";
       document.getElementById("pageShooting").style.display = "block";
+
+      // 嘗試請求橫向螢幕鎖定 (若瀏覽器支援)
+      try {
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock("landscape").catch(() => {});
+        }
+      } catch (e) {}
 
       try {
         if (!videoStream) {
@@ -339,11 +475,12 @@
           document.getElementById("cameraVideo").srcObject = videoStream;
         }
       } catch (err) {
-        alert("無法啟動內嵌鏡頭，請確認網址為 GitHub Pages (https) 並允許相機權限：" + err);
+        alert("無法啟動鏡頭，請確認允許相機權限：" + err);
       }
     }
 
     function finishGroupAndReturn() {
+      document.body.classList.remove("force-landscape");
       currentGroupShots = 0;
       groupBaseEpochMs = null;
       document.getElementById("pageShooting").style.display = "none";
@@ -394,7 +531,36 @@
       ctx.fillText(dateStr, boxX1 + padX, boxY1 + boxH / 2);
     }
 
-    // 點擊橘色快門：0.01秒瞬間擷取畫面、壓浮水印、背景上傳，鏡頭完全不關閉！
+    // 🌟 強制擷取為 4:3 橫式照片 (Width : Height = 4 : 3，例如 1440 x 1080)，與畫面上的橫式取景框 100% 一致！
+    function drawSourceAsLandscape4x3(sourceEl, srcW, srcH) {
+      const canvas = document.getElementById("watermarkCanvas");
+      const ctx = canvas.getContext("2d");
+
+      const targetRatio = 4 / 3;
+      const outW = 1440;
+      const outH = 1080;
+      canvas.width = outW;
+      canvas.height = outH;
+
+      // 計算中心裁切區域以符合 4:3 橫式取景框
+      let cropW, cropH, cropX, cropY;
+      if (srcW / srcH > targetRatio) {
+        cropH = srcH;
+        cropW = Math.round(srcH * targetRatio);
+        cropX = Math.round((srcW - cropW) / 2);
+        cropY = 0;
+      } else {
+        cropW = srcW;
+        cropH = Math.round(srcW / targetRatio);
+        cropX = 0;
+        cropY = Math.round((srcH - cropH) / 2);
+      }
+
+      ctx.drawImage(sourceEl, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
+      drawTimestampOnCanvas(ctx, outW, outH);
+      return canvas.toDataURL("image/jpeg", 0.92);
+    }
+
     function takeInstantShot() {
       const video = document.getElementById("cameraVideo");
       if (!video || !video.videoWidth) {
@@ -402,29 +568,25 @@
         return;
       }
 
-      // 快門閃光視覺回饋
       const flash = document.getElementById("flashOverlay");
       flash.style.opacity = "0.85";
       setTimeout(() => { flash.style.opacity = "0"; }, 100);
 
-      const canvas = document.getElementById("watermarkCanvas");
-      const ctx = canvas.getContext("2d");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      drawTimestampOnCanvas(ctx, canvas.width, canvas.height);
-      const watermarkedBase64 = canvas.toDataURL("image/jpeg", 0.92);
-
+      const watermarkedBase64 = drawSourceAsLandscape4x3(video, video.videoWidth, video.videoHeight);
       queueUpload(watermarkedBase64);
     }
 
     function queueUpload(watermarkedBase64) {
       const vendor = getSelectedVendor();
+      const pType = currentPhotoType;
+
       if (!groupBaseEpochMs) groupBaseEpochMs = Date.now();
       currentGroupShots++;
       const shotNum = currentGroupShots;
-      const lockedTimeStr = formatTaiwanTimeStr(groupBaseEpochMs + (shotNum - 1) * 1000);
+
+      // 工班拍照鎖定同組連號時間；鼠患拍照使用實際秒數
+      const timeEpoch = (pType === "WORKER") ? (groupBaseEpochMs + (shotNum - 1) * 1000) : (Date.now() + shotNum * 100);
+      const lockedTimeStr = formatTaiwanTimeStr(timeEpoch);
 
       updateShootingUI();
 
@@ -438,7 +600,7 @@
       const statusBox = document.getElementById("statusBox");
       const logList = document.getElementById("logList");
       activeUploads++;
-      statusBox.innerText = `⏳ 背景上傳中 (尚有 ${activeUploads} 張)... 可直接繼續按快門拍下一張！`;
+      statusBox.innerText = `⏳ 背景上傳中 (尚有 ${activeUploads} 張)... 可直接繼續拍下一張！`;
 
       fetch(GAS_WEB_APP_URL, {
         method: "POST",
@@ -446,7 +608,8 @@
           base64Data: watermarkedBase64,
           vendorName: vendor,
           isNight: isNightMode,
-          customTimeStr: lockedTimeStr
+          customTimeStr: lockedTimeStr,
+          photoType: pType
         })
       })
       .then(r => r.json())
@@ -454,7 +617,7 @@
         activeUploads = Math.max(0, activeUploads - 1);
         if (res && res.success) {
           if (activeUploads === 0) {
-            statusBox.innerText = `✅ 本組 ${currentGroupShots} 張已全部安全存入雲端！`;
+            statusBox.innerText = `✅ 第 ${shotNum} 張已安全存入雲端！`;
           } else {
             statusBox.innerText = `⏳ 背景上傳中 (尚有 ${activeUploads} 張)...`;
           }
@@ -465,7 +628,7 @@
       })
       .catch(err => {
         activeUploads = Math.max(0, activeUploads - 1);
-        statusBox.innerText = `❌ 網路或網址設定錯誤：${err}`;
+        statusBox.innerText = `❌ 網路錯誤：${err}`;
       });
     }
 
@@ -479,18 +642,8 @@
         reader.onload = function(e) {
           const img = new Image();
           img.onload = function() {
-            const canvas = document.getElementById("watermarkCanvas");
-            const ctx = canvas.getContext("2d");
-            const maxDim = 1920;
-            let w = img.width, h = img.height;
-            if (w > maxDim || h > maxDim) {
-              if (w > h) { h = Math.round(h * (maxDim / w)); w = maxDim; }
-              else { w = Math.round(w * (maxDim / h)); h = maxDim; }
-            }
-            canvas.width = w; canvas.height = h;
-            ctx.drawImage(img, 0, 0, w, h);
-            drawTimestampOnCanvas(ctx, w, h);
-            queueUpload(canvas.toDataURL("image/jpeg", 0.92));
+            const watermarkedBase64 = drawSourceAsLandscape4x3(img, img.width, img.height);
+            queueUpload(watermarkedBase64);
           };
           img.src = e.target.result;
         };
