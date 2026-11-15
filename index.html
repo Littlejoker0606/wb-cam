@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="color-scheme" content="only light">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>旺邦營造 · 現場出工連拍</title>
+  <style>
+    :root, html, body {
+      color-scheme: only light !important;
+      forced-color-adjust: none !important;
+      -webkit-forced-color-adjust: none !important;
+    }
+    * { box-sizing: border-box; font-family: "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, sans-serif; }
+
+    body {
+      margin: 0; padding: 14px;
+      background-color: #F4F2EC;
+      color: #2C3A31;
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      width: 100%; max-width: 430px;
+      background-color: #FFFFFF;
+      background-size: cover;
+      border-radius: 26px;
+      padding: 18px; margin-bottom: 14px;
+      box-shadow: 0 10px 24px rgba(145, 160, 150, 0.25);
+      border: 1.5px solid #E2EBE2;
+      position: relative;
+    }
+
+    .card-hero {
+      background: linear-gradient(135deg, #D2EBD0 0%, #B8DAB7 55%, #C2E5F5 100%);
+      background-size: cover;
+      border: 1.5px solid #B8D8B7;
+    }
+
+    .dots { display: flex; gap: 6px; margin-bottom: 6px; }
+    .dot-orange { width: 11px; height: 11px; border-radius: 50%; background: #F6BC7E; }
+    .dot-blue { width: 11px; height: 11px; border-radius: 50%; background: #88C4E6; }
+
+    h2 { margin: 4px 0 16px 0; font-size: 21px; text-align: center; color: #243529; font-weight: 800; }
+    label.sec-title { font-size: 14px; font-weight: bold; color: #435949; display: block; margin-bottom: 8px; }
+
+    select, input[type="text"] {
+      width: 100%; padding: 14px 16px; font-size: 20px; font-weight: bold;
+      color: #243529; background-color: #FFFFFF;
+      background-size: cover;
+      border: 2px solid #CFE3CE; border-radius: 30px;
+      box-shadow: 0 4px 12px rgba(120, 145, 125, 0.15);
+      outline: none; text-align: center; margin-bottom: 14px;
+    }
+
+    .shift-pill {
+      width: 100%; padding: 12px; border-radius: 25px; text-align: center;
+      font-weight: bold; font-size: 15px; cursor: pointer;
+      background-color: #FFF9EC; background-size: cover; color: #435747;
+      border: 2px solid #EBD7B5; margin-bottom: 18px;
+      user-select: none;
+    }
+    .shift-pill.night {
+      background-color: #4A6274; color: #FFFFFF; border-color: #394E5E;
+    }
+
+    /* 拍攝頁頂部廠商資訊橫幅 */
+    .Current-vendor-banner {
+      background-color: #EEF7EE; background-size: cover;
+      border: 2px solid #C5E0C6; border-radius: 18px;
+      padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 12px;
+    }
+    .vendor-big-name { font-size: 19px; font-weight: 900; color: #2B5434; }
+    .shot-counter-badge {
+      padding: 4px 12px; background-color: #FFFFFF; background-size: cover;
+      border-radius: 20px; font-size: 14px; font-weight: bold; color: #D97925;
+      border: 1px solid #F0D2B5;
+    }
+
+    /* 常駐不關閉的網頁內嵌即時相機鏡頭 */
+    #cameraContainer {
+      width: 100%; border-radius: 20px; overflow: hidden;
+      background: #1E2420; position: relative;
+      margin-bottom: 12px; border: 2px solid #B8D8B7;
+      aspect-ratio: 4 / 3;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #cameraVideo {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    #flashOverlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: #FFFFFF; opacity: 0; pointer-events: none; transition: opacity 0.12s;
+    }
+
+    /* 暖杏橘色超大快門按鈕 */
+    .btn-orange-huge {
+      width: 100%; padding: 20px 16px; border-radius: 32px; border: none;
+      background: linear-gradient(135deg, #FAD09C 0%, #F0A35E 100%);
+      background-size: cover;
+      color: #FFFFFF; font-size: 21px; font-weight: bold;
+      text-shadow: 0 1px 3px rgba(150, 75, 15, 0.35);
+      box-shadow: 0 8px 18px rgba(240, 163, 94, 0.45);
+      cursor: pointer; margin-bottom: 10px; display: block; text-align: center;
+      user-select: none;
+    }
+    .btn-orange-huge:active { transform: scale(0.96); }
+
+    /* 嫩芽綠「確認這組工班拍攝結束」大按鈕 */
+    .btn-finish-group {
+      width: 100%; padding: 16px; border-radius: 28px;
+      border: 2px solid #78AD80;
+      background: linear-gradient(135deg, #A8D4AD 0%, #7BB383 100%);
+      background-size: cover;
+      color: #FFFFFF; font-size: 18px; font-weight: bold;
+      text-shadow: 0 1px 2px rgba(40, 90, 50, 0.3);
+      box-shadow: 0 6px 14px rgba(123, 179, 131, 0.38);
+      cursor: pointer; display: block; text-align: center;
+      margin-bottom: 10px; user-select: none;
+    }
+    .btn-finish-group:active { transform: scale(0.98); }
+
+    /* 晴空粉藍相簿多選按鈕 */
+    .btn-blue-sub {
+      width: 100%; padding: 11px; border-radius: 24px; border: none;
+      background: linear-gradient(135deg, #C6E7F7 0%, #9BCDE6 100%);
+      background-size: cover;
+      color: #1F4457; font-size: 14px; font-weight: bold;
+      cursor: pointer; display: block; text-align: center;
+      margin-bottom: 10px;
+    }
+
+    /* 已拍照片縮圖列 */
+    .thumb-strip {
+      display: flex; gap: 8px; overflow-x: auto; padding: 4px 0;
+      margin-bottom: 8px; min-height: 6px;
+    }
+    .thumb-item {
+      width: 64px; height: 64px; border-radius: 10px; object-fit: cover;
+      border: 2px solid #88B88E; flex-shrink: 0;
+    }
+
+    .status-box {
+      font-size: 13px; font-weight: bold; text-align: center;
+      padding: 10px; border-radius: 14px;
+      background-color: #F0F7F0; background-size: cover; color: #356640;
+      border: 1px solid #CDE3CF;
+    }
+    .log-list { font-size: 12px; color: #3A6644; margin-top: 8px; line-height: 1.6; max-height: 90px; overflow-y: auto; }
+    input[type="file"] { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- ================= 【第一頁：廠商選擇頁面】 ================= -->
+  <div id="pageSelectVendor" class="card card-hero">
+    <div class="dots"><div class="dot-orange"></div><div class="dot-blue"></div></div>
+    <h2>旺邦營造 · 現場出工拍照</h2>
+
+    <label class="sec-title">1. 請選擇要拍攝的出工廠商</label>
+    <select id="vendorSelect" onchange="onVendorChange()">
+      <option value="弘佾">弘佾</option>
+      <option value="上承">上承</option>
+      <option value="井帝">井帝</option>
+      <option value="天盛">天盛</option>
+      <option value="全暐">全暐</option>
+      <option value="昇萌">昇萌</option>
+      <option value="長和">長和</option>
+      <option value="春豐">春豐</option>
+      <option value="時勝">時勝</option>
+      <option value="海納">海納</option>
+      <option value="勝順">勝順</option>
+      <option value="筌幄">筌幄</option>
+      <option value="源鴻">源鴻</option>
+      <option value="鼎創">鼎創</option>
+      <option value="樹花園">樹花園</option>
+      <option value="燕銘">燕銘</option>
+      <option value="鎮遠">鎮遠</option>
+      <option value="繽紛">繽紛</option>
+      <option value="__CUSTOM__">➕ 手動輸入其他廠商...</option>
+    </select>
+
+    <input type="text" id="customVendorInput" placeholder="請輸入新廠商名稱" style="display:none;">
+
+    <div id="shiftBtn" class="shift-pill" onclick="toggleShift()">☀️ 目前模式：日班 (點此切換夜班)</div>
+
+    <div id="btnStartShoot" class="btn-orange-huge" onclick="startGroupShooting()">📷 開始拍攝這組工班</div>
+  </div>
+
+  <!-- ================= 【第二頁：常駐鏡頭不跳轉連拍介面】 ================= -->
+  <div id="pageShooting" class="card" style="display:none;">
+    <div id="vendorBanner" class="Current-vendor-banner">
+      <div id="shootingVendorTitle" class="vendor-big-name">👷 全暐 (日班)</div>
+      <div id="shotCounterText" class="shot-counter-badge">📸 已拍 0 張</div>
+    </div>
+
+    <!-- 常駐開啟的相機取景框 (連按快門完全不關閉、不跳轉！) -->
+    <div id="cameraContainer">
+      <video id="cameraVideo" autoplay playsinline muted></video>
+      <div id="flashOverlay"></div>
+    </div>
+
+    <!-- 剛拍的照片縮圖預覽列 -->
+    <div id="thumbStrip" class="thumb-strip"></div>
+
+    <!-- 超大快門按鈕：點一下直接拍並背景上傳，鏡頭維持開啟！ -->
+    <div id="shutterBtn" class="btn-orange-huge" onclick="takeInstantShot()">
+      📸 按下快門拍照 (拍第 1 張)
+    </div>
+
+    <!-- 確認這組工班拍攝結束返回按鈕 -->
+    <div id="btnFinishGroup" class="btn-finish-group" onclick="finishGroupAndReturn()">
+      ✅ 確認這組工班拍攝結束 (返回選廠商)
+    </div>
+
+    <!-- 備用：從相簿多選 -->
+    <label id="btnGallerySub" class="btn-blue-sub" for="galleryInput">🖼️ 或從手機相簿勾選照片上傳</label>
+    <input type="file" id="galleryInput" accept="image/*" multiple onchange="handleGalleryFiles(this.files)">
+
+    <div id="statusBox" class="status-box">🟢 對準工班直接按橘色快門即可連拍！</div>
+    <div id="logList" class="log-list"></div>
+  </div>
+
+  <canvas id="watermarkCanvas" style="display:none;"></canvas>
+
+  <script>
+    // ✅ 已自動填入您專屬的 Google Apps Script 網址
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxRi29SB802ZJSssGKp8Ki6-g-dx3VvVVkMO857_kum88V-FC2KhEqCj4IZKMPcYQcn/exec";
+
+    let isNightMode = false;
+    let currentGroupShots = 0;
+    let groupBaseEpochMs = null;
+    let activeUploads = 0;
+    let videoStream = null;
+
+    function makeGradientPng(c1, c2) {
+      const c = document.createElement("canvas");
+      c.width = 60; c.height = 60;
+      const ctx = c.getContext("2d");
+      const g = ctx.createLinearGradient(0, 0, 60, 60);
+      g.addColorStop(0, c1);
+      g.addColorStop(1, c2 || c1);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 60, 60);
+      return "url(" + c.toDataURL("image/png") + ")";
+    }
+
+    function applyBrightThemeBitmaps() {
+      document.body.style.backgroundImage = makeGradientPng("#F4F2EC", "#F4F2EC");
+      document.getElementById("pageSelectVendor").style.backgroundImage = makeGradientPng("#D2EBD0", "#C2E5F5");
+      document.getElementById("pageShooting").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
+      document.getElementById("vendorSelect").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
+      document.getElementById("shiftBtn").style.backgroundImage = makeGradientPng("#FFF9EC", "#FFF9EC");
+      document.getElementById("btnStartShoot").style.backgroundImage = makeGradientPng("#FAD09C", "#F0A35E");
+      document.getElementById("shutterBtn").style.backgroundImage = makeGradientPng("#FAD09C", "#F0A35E");
+      document.getElementById("btnGallerySub").style.backgroundImage = makeGradientPng("#C6E7F7", "#9BCDE6");
+      document.getElementById("btnFinishGroup").style.backgroundImage = makeGradientPng("#A8D4AD", "#7BB383");
+      document.getElementById("vendorBanner").style.backgroundImage = makeGradientPng("#EEF7EE", "#EEF7EE");
+      document.getElementById("shotCounterText").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
+      document.getElementById("statusBox").style.backgroundImage = makeGradientPng("#F0F7F0", "#F0F7F0");
+    }
+
+    window.onload = function() {
+      applyBrightThemeBitmaps();
+      const savedVendor = localStorage.getItem("wb_last_vendor");
+      if (savedVendor) {
+        const sel = document.getElementById("vendorSelect");
+        for (let i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].value === savedVendor) {
+            sel.selectedIndex = i;
+            break;
+          }
+        }
+      }
+    };
+
+    function onVendorChange() {
+      const val = document.getElementById("vendorSelect").value;
+      const customInp = document.getElementById("customVendorInput");
+      if (val === "__CUSTOM__") {
+        customInp.style.display = "block";
+        customInp.focus();
+      } else {
+        customInp.style.display = "none";
+        localStorage.setItem("wb_last_vendor", val);
+      }
+    }
+
+    function toggleShift() {
+      isNightMode = !isNightMode;
+      const btn = document.getElementById("shiftBtn");
+      if (isNightMode) {
+        btn.className = "shift-pill night";
+        btn.style.backgroundImage = makeGradientPng("#4A6274", "#394E5E");
+        btn.innerText = "🌙 目前模式：夜班 (點此切換日班)";
+      } else {
+        btn.className = "shift-pill";
+        btn.style.backgroundImage = makeGradientPng("#FFF9EC", "#FFF9EC");
+        btn.innerText = "☀️ 目前模式：日班 (點此切換夜班)";
+      }
+    }
+
+    function getSelectedVendor() {
+      const sel = document.getElementById("vendorSelect").value;
+      if (sel === "__CUSTOM__") {
+        return document.getElementById("customVendorInput").value.trim();
+      }
+      return sel;
+    }
+
+    // 啟動內嵌後置鏡頭
+    async function startGroupShooting() {
+      const vendor = getSelectedVendor();
+      if (!vendor) {
+        alert("請先選擇或輸入廠商名稱！");
+        return;
+      }
+      currentGroupShots = 0;
+      groupBaseEpochMs = Date.now();
+      document.getElementById("thumbStrip").innerHTML = "";
+
+      const shiftStr = isNightMode ? "夜班" : "日班";
+      document.getElementById("shootingVendorTitle").innerText = `👷 ${vendor} (${shiftStr})`;
+      updateShootingUI();
+
+      document.getElementById("pageSelectVendor").style.display = "none";
+      document.getElementById("pageShooting").style.display = "block";
+
+      try {
+        if (!videoStream) {
+          videoStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+            audio: false
+          });
+          document.getElementById("cameraVideo").srcObject = videoStream;
+        }
+      } catch (err) {
+        alert("無法啟動內嵌鏡頭，請確認網址為 GitHub Pages (https) 並允許相機權限：" + err);
+      }
+    }
+
+    function finishGroupAndReturn() {
+      currentGroupShots = 0;
+      groupBaseEpochMs = null;
+      document.getElementById("pageShooting").style.display = "none";
+      document.getElementById("pageSelectVendor").style.display = "block";
+    }
+
+    function updateShootingUI() {
+      document.getElementById("shotCounterText").innerText = `📸 已拍 ${currentGroupShots} 張`;
+      document.getElementById("shutterBtn").innerText = `📸 按下快門連拍 (拍第 ${currentGroupShots + 1} 張)`;
+    }
+
+    function formatTaiwanTimeStr(epochMs) {
+      const twDate = new Date(epochMs + (8 * 3600 * 1000));
+      const yyyy = twDate.getUTCFullYear();
+      const mm = String(twDate.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(twDate.getUTCDate()).padStart(2, '0');
+      const hh = String(twDate.getUTCHours()).padStart(2, '0');
+      const min = String(twDate.getUTCMinutes()).padStart(2, '0');
+      const ss = String(twDate.getUTCSeconds()).padStart(2, '0');
+      return `${yyyy}${mm}${dd}_${hh}${min}${ss}`;
+    }
+
+    function drawTimestampOnCanvas(ctx, w, h) {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const dateStr = `${yyyy}/${mm}/${dd}`;
+
+      const targetBoxH = Math.max(24, Math.floor(h * 0.05));
+      const fontSize = Math.max(14, Math.floor(targetBoxH * 0.72));
+      ctx.font = `bold ${fontSize}px "Microsoft JhengHei", sans-serif`;
+      ctx.textBaseline = "middle";
+
+      const textW = ctx.measureText(dateStr).width;
+      const padX = Math.max(8, Math.floor(fontSize * 0.35));
+      const boxW = textW + padX * 2;
+      const boxH = targetBoxH;
+
+      const marginR = Math.max(10, Math.floor(w * 0.022));
+      const marginB = Math.max(10, Math.floor(h * 0.030));
+      const boxX1 = w - marginR - boxW;
+      const boxY1 = h - marginB - boxH;
+
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(boxX1, boxY1, boxW, boxH);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillText(dateStr, boxX1 + padX, boxY1 + boxH / 2);
+    }
+
+    // 點擊橘色快門：0.01秒瞬間擷取畫面、壓浮水印、背景上傳，鏡頭完全不關閉！
+    function takeInstantShot() {
+      const video = document.getElementById("cameraVideo");
+      if (!video || !video.videoWidth) {
+        alert("鏡頭尚未就緒，請稍候 1 秒再按！");
+        return;
+      }
+
+      // 快門閃光視覺回饋
+      const flash = document.getElementById("flashOverlay");
+      flash.style.opacity = "0.85";
+      setTimeout(() => { flash.style.opacity = "0"; }, 100);
+
+      const canvas = document.getElementById("watermarkCanvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      drawTimestampOnCanvas(ctx, canvas.width, canvas.height);
+      const watermarkedBase64 = canvas.toDataURL("image/jpeg", 0.92);
+
+      queueUpload(watermarkedBase64);
+    }
+
+    function queueUpload(watermarkedBase64) {
+      const vendor = getSelectedVendor();
+      if (!groupBaseEpochMs) groupBaseEpochMs = Date.now();
+      currentGroupShots++;
+      const shotNum = currentGroupShots;
+      const lockedTimeStr = formatTaiwanTimeStr(groupBaseEpochMs + (shotNum - 1) * 1000);
+
+      updateShootingUI();
+
+      const thumbStrip = document.getElementById("thumbStrip");
+      const thumb = document.createElement("img");
+      thumb.className = "thumb-item";
+      thumb.src = watermarkedBase64;
+      thumbStrip.appendChild(thumb);
+      thumbStrip.scrollLeft = thumbStrip.scrollWidth;
+
+      const statusBox = document.getElementById("statusBox");
+      const logList = document.getElementById("logList");
+      activeUploads++;
+      statusBox.innerText = `⏳ 背景上傳中 (尚有 ${activeUploads} 張)... 可直接繼續按快門拍下一張！`;
+
+      fetch(GAS_WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          base64Data: watermarkedBase64,
+          vendorName: vendor,
+          isNight: isNightMode,
+          customTimeStr: lockedTimeStr
+        })
+      })
+      .then(r => r.json())
+      .then(res => {
+        activeUploads = Math.max(0, activeUploads - 1);
+        if (res && res.success) {
+          if (activeUploads === 0) {
+            statusBox.innerText = `✅ 本組 ${currentGroupShots} 張已全部安全存入雲端！`;
+          } else {
+            statusBox.innerText = `⏳ 背景上傳中 (尚有 ${activeUploads} 張)...`;
+          }
+          logList.innerHTML = `<div>🟢 [第${shotNum}張] <b>${res.vendor}</b> / ${res.fileName}</div>` + logList.innerHTML;
+        } else {
+          statusBox.innerText = `❌ 上傳失敗：${res ? res.error : ''}`;
+        }
+      })
+      .catch(err => {
+        activeUploads = Math.max(0, activeUploads - 1);
+        statusBox.innerText = `❌ 網路或網址設定錯誤：${err}`;
+      });
+    }
+
+    function handleGalleryFiles(files) {
+      if (!files || files.length === 0) return;
+      const fileList = Array.from(files);
+      document.getElementById("galleryInput").value = "";
+
+      fileList.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.getElementById("watermarkCanvas");
+            const ctx = canvas.getContext("2d");
+            const maxDim = 1920;
+            let w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round(h * (maxDim / w)); w = maxDim; }
+              else { w = Math.round(w * (maxDim / h)); h = maxDim; }
+            }
+            canvas.width = w; canvas.height = h;
+            ctx.drawImage(img, 0, 0, w, h);
+            drawTimestampOnCanvas(ctx, w, h);
+            queueUpload(canvas.toDataURL("image/jpeg", 0.92));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  </script>
+</body>
+</html>
