@@ -1,3 +1,5 @@
+--- START OF FILE index.html ---
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -49,6 +51,15 @@
 
     h2 { margin: 2px 0 14px 0; font-size: 21px; text-align: center; color: #243529; font-weight: 800; }
     label.sec-title { font-size: 14px; font-weight: bold; color: #3D5243; display: block; margin-bottom: 6px; }
+
+    .sec-title-row {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+    }
+    .sync-badge {
+      font-size: 11px; font-weight: bold; color: #3A6B48;
+      background: rgba(255, 255, 255, 0.75); padding: 2px 8px;
+      border-radius: 12px; border: 1px solid #B8D8B7;
+    }
 
     select, input[type="text"] {
       width: 100%; padding: 13px 16px; font-size: 19px; font-weight: bold;
@@ -246,12 +257,16 @@
 
     <!-- 2A. 工班出工專屬設定區 (選鼠患時自動隱藏) -->
     <div id="workerConfigBox" class="sub-box">
-      <label class="sec-title">2. 請選擇要拍攝的出工廠商</label>
+      <div class="sec-title-row">
+        <label class="sec-title" style="margin-bottom:0;">2. 請選擇要拍攝的出工廠商</label>
+        <span id="vendorSyncBadge" class="sync-badge">☁️ 同步清單中...</span>
+      </div>
       <select id="vendorSelect" onchange="onVendorChange()">
-        <option value="弘佾">弘佾</option>
+        <option value="力陞">力陞</option>
         <option value="上承">上承</option>
         <option value="井帝">井帝</option>
         <option value="天盛">天盛</option>
+        <option value="弘佾">弘佾</option>
         <option value="全暐">全暐</option>
         <option value="昇萌">昇萌</option>
         <option value="長和">長和</option>
@@ -269,7 +284,7 @@
         <option value="__CUSTOM__">➕ 手動輸入其他廠商...</option>
       </select>
 
-      <input type="text" id="customVendorInput" placeholder="請輸入新廠商名稱" style="display:none;">
+      <input type="text" id="customVendorInput" placeholder="請輸入新廠商名稱 (將自動同步至NAS)" style="display:none;">
       <div id="shiftBtn" class="shift-pill" onclick="toggleShift()">☀️ 目前模式：日班 (點此切換夜班)</div>
     </div>
 
@@ -331,6 +346,13 @@
     // ✅ 已填入您專屬的 Google Apps Script 網址
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxRi29SB802ZJSssGKp8Ki6-g-dx3VvVVkMO857_kum88V-FC2KhEqCj4IZKMPcYQcn/exec";
 
+    // 預設基準廠商清單 (含 NAS 內的「力陞」共 19 家)
+    const DEFAULT_VENDORS = [
+      "力陞", "上承", "井帝", "天盛", "弘佾", "全暐", "昇萌", "長和", "春豐",
+      "時勝", "海納", "勝順", "筌幄", "源鴻", "鼎創", "樹花園", "燕銘",
+      "鎮遠", "繽紛"
+    ];
+
     let currentPhotoType = "WORKER"; // "WORKER" (工班) 或 "RAT" (鼠患)
     let isNightMode = false;
     let currentGroupShots = 0;
@@ -356,6 +378,7 @@
       document.getElementById("pageShooting").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
       document.getElementById("photoTypeSelect").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
       document.getElementById("vendorSelect").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
+      document.getElementById("customVendorInput").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
       document.getElementById("shiftBtn").style.backgroundImage = makeGradientPng("#FFF9EC", "#FFF9EC");
       document.getElementById("btnStartShoot").style.backgroundImage = makeGradientPng("#FAD09C", "#F0A35E");
       document.getElementById("shutterBtn").style.backgroundImage = makeGradientPng("#FAD09C", "#F0A35E");
@@ -366,18 +389,130 @@
       document.getElementById("statusBox").style.backgroundImage = makeGradientPng("#F0F7F0", "#F0F7F0");
     }
 
-    window.onload = function() {
-      applyBrightThemeBitmaps();
-      const savedVendor = localStorage.getItem("wb_last_vendor");
-      if (savedVendor) {
-        const sel = document.getElementById("vendorSelect");
-        for (let i = 0; i < sel.options.length; i++) {
-          if (sel.options[i].value === savedVendor) {
-            sel.selectedIndex = i;
-            break;
-          }
+    // ================= [廠商清單渲染與雲端 NAS 自動同步] =================
+    function getCachedVendorList() {
+      try {
+        const raw = localStorage.getItem("wb_vendor_list_cache");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+      return DEFAULT_VENDORS.slice();
+    }
+
+    function renderVendorOptions(vendorList, preferredVendor) {
+      if (!Array.isArray(vendorList) || vendorList.length === 0) return;
+
+      const sel = document.getElementById("vendorSelect");
+      const customInp = document.getElementById("customVendorInput");
+      const wasCustomMode = (sel.value === "__CUSTOM__") && !preferredVendor;
+      const targetSelect = preferredVendor || sel.value || localStorage.getItem("wb_last_vendor") || vendorList[0];
+
+      const cleanList = [];
+      const seen = {};
+      for (let i = 0; i < vendorList.length; i++) {
+        const v = String(vendorList[i] || "").trim();
+        if (v && v !== "__CUSTOM__" && v !== "鼠患檢查" && v !== "未命名廠商" && !seen[v]) {
+          seen[v] = true;
+          cleanList.push(v);
         }
       }
+
+      try {
+        localStorage.setItem("wb_vendor_list_cache", JSON.stringify(cleanList));
+      } catch (e) {}
+
+      sel.innerHTML = "";
+      for (let i = 0; i < cleanList.length; i++) {
+        const opt = document.createElement("option");
+        opt.value = cleanList[i];
+        opt.textContent = cleanList[i];
+        sel.appendChild(opt);
+      }
+
+      const customOpt = document.createElement("option");
+      customOpt.value = "__CUSTOM__";
+      customOpt.textContent = "➕ 手動輸入其他廠商...";
+      sel.appendChild(customOpt);
+
+      if (wasCustomMode) {
+        sel.value = "__CUSTOM__";
+        customInp.style.display = "block";
+      } else if (seen[targetSelect]) {
+        sel.value = targetSelect;
+        customInp.style.display = "none";
+        localStorage.setItem("wb_last_vendor", targetSelect);
+      } else if (cleanList.length > 0) {
+        sel.value = cleanList[0];
+        customInp.style.display = "none";
+        localStorage.setItem("wb_last_vendor", cleanList[0]);
+      }
+    }
+
+    function syncVendorsFromCloud() {
+      const badge = document.getElementById("vendorSyncBadge");
+      if (badge) badge.innerText = "☁️ 同步清單中...";
+
+      fetch(GAS_WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "GET_VENDORS" })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res && res.success && Array.isArray(res.vendors) && res.vendors.length > 0) {
+          renderVendorOptions(res.vendors);
+          if (badge) badge.innerText = `☁️ 已同步 NAS (${res.vendors.length}家)`;
+        } else {
+          if (badge) badge.innerText = "☁️ 離線快取清單";
+        }
+      })
+      .catch(() => {
+        if (badge) badge.innerText = "☁️ 離線快取清單";
+      });
+    }
+
+    function pushNewVendorToCloud(newVendorName) {
+      const cleanName = String(newVendorName || "").trim();
+      if (!cleanName || cleanName === "__CUSTOM__" || cleanName === "鼠患檢查") return;
+
+      // 先在手機本地選單立即加入並選取該新廠商
+      const currentList = getCachedVendorList();
+      if (currentList.indexOf(cleanName) === -1) {
+        currentList.push(cleanName);
+      }
+      renderVendorOptions(currentList, cleanName);
+      document.getElementById("customVendorInput").value = "";
+
+      const badge = document.getElementById("vendorSyncBadge");
+      if (badge) badge.innerText = `☁️ 正在同步「${cleanName}」...`;
+
+      // 非阻塞背景通知雲端與 NAS 建立該廠商資料夾并同步給所有人的手機
+      fetch(GAS_WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "ADD_VENDOR",
+          vendorName: cleanName
+        })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res && res.success && Array.isArray(res.vendors)) {
+          renderVendorOptions(res.vendors, cleanName);
+          if (badge) badge.innerText = `☁️ 已同步 NAS (${res.vendors.length}家)`;
+        }
+      })
+      .catch(() => {});
+    }
+
+    window.onload = function() {
+      applyBrightThemeBitmaps();
+      // 1. 先瞬間載入本地快取清單與上次選取的廠商
+      const cachedList = getCachedVendorList();
+      const savedVendor = localStorage.getItem("wb_last_vendor");
+      renderVendorOptions(cachedList, savedVendor);
+      // 2. 背景向 GAS 雲端拉取與電腦 NAS 同步的最新廠商清單
+      syncVendorsFromCloud();
     };
 
     function onPhotoTypeChange() {
@@ -437,11 +572,20 @@
     }
 
     async function startGroupShooting() {
+      const isCustomSelected = (currentPhotoType === "WORKER" && document.getElementById("vendorSelect").value === "__CUSTOM__");
       const vendor = getSelectedVendor();
       if (!vendor) {
         alert("請先選擇或輸入廠商名稱！");
         return;
       }
+
+      // 若是手動輸入的新廠商，立即加入選單並自動同步至雲端與 NAS
+      if (isCustomSelected) {
+        pushNewVendorToCloud(vendor);
+      } else if (currentPhotoType === "WORKER") {
+        localStorage.setItem("wb_last_vendor", vendor);
+      }
+
       currentGroupShots = 0;
       groupBaseEpochMs = Date.now();
       document.getElementById("thumbStrip").innerHTML = "";
@@ -484,6 +628,8 @@
       groupBaseEpochMs = null;
       document.getElementById("pageShooting").style.display = "none";
       document.getElementById("pageSelectVendor").style.display = "block";
+      // 返回選廠商頁面時，自動在背景同步一次最新雲端/NAS廠商清單
+      syncVendorsFromCloud();
     }
 
     function updateShootingUI() {
@@ -648,6 +794,9 @@
       .then(res => {
         activeUploads = Math.max(0, activeUploads - 1);
         if (res && res.success) {
+          if (Array.isArray(res.vendors) && res.vendors.length > 0) {
+            renderVendorOptions(res.vendors, pType === "WORKER" ? vendor : null);
+          }
           if (activeUploads === 0) {
             statusBox.innerText = `✅ 第 ${shotNum} 張 (含 EXIF) 已安全存入雲端！`;
           } else {
@@ -685,3 +834,4 @@
   </script>
 </body>
 </html>
+--- END OF FILE index.html ---
