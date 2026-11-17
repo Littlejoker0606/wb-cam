@@ -1,10 +1,8 @@
---- START OF FILE index.html ---
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="only light">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -20,20 +18,22 @@
     * { box-sizing: border-box; font-family: "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, sans-serif; }
 
     body {
-      margin: 0; padding: 12px;
+      margin: 0; padding: 10px;
       background-color: #F4F2EC;
       color: #2C3A31;
       display: flex; flex-direction: column; align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
     }
 
+    /* ================= 【第一頁：選擇拍攝類別與廠商頁面】 ================= */
     .card {
       width: 100%; max-width: 440px;
       background-color: #FFFFFF;
       background-size: cover;
       border-radius: 26px;
-      padding: 18px; margin-bottom: 12px;
+      padding: 18px;
       box-shadow: 0 10px 24px rgba(145, 160, 150, 0.25);
       border: 1.5px solid #E2EBE2;
       position: relative;
@@ -57,7 +57,7 @@
     }
     .sync-badge {
       font-size: 11px; font-weight: bold; color: #3A6B48;
-      background: rgba(255, 255, 255, 0.75); padding: 2px 8px;
+      background: rgba(255, 255, 255, 0.78); padding: 2px 8px;
       border-radius: 12px; border: 1px solid #B8D8B7;
     }
 
@@ -70,7 +70,6 @@
       outline: none; text-align: center; margin-bottom: 12px;
     }
 
-    /* 內層分區盒 */
     .sub-box {
       background: rgba(255, 255, 255, 0.65);
       border: 1.5px solid #CFE4CE;
@@ -90,155 +89,398 @@
       background-color: #4A6274; color: #FFFFFF; border-color: #394E5E;
     }
 
-    /* 拍攝頁頂部資訊橫幅 */
-    .Current-vendor-banner {
-      background-color: #EEF7EE; background-size: cover;
-      border: 2px solid #C5E0C6; border-radius: 16px;
-      padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 10px; gap: 6px;
-    }
-    .vendor-big-name { font-size: 17px; font-weight: 900; color: #2B5434; }
-    .shot-counter-badge {
-      padding: 4px 10px; background-color: #FFFFFF; background-size: cover;
-      border-radius: 18px; font-size: 13px; font-weight: bold; color: #D97925;
-      border: 1px solid #F0D2B5; white-space: nowrap;
-    }
-    .rotate-btn {
-      padding: 5px 10px; background-color: #E2F0F9; color: #24526E;
-      border-radius: 16px; font-size: 12px; font-weight: bold;
-      border: 1px solid #B5D7EC; cursor: pointer; white-space: nowrap;
-    }
-
-    /* ================= 橫式相機佈局 (支援手機橫拿與強制橫向模式) ================= */
-    .shooting-layout {
-      display: flex; flex-direction: column; width: 100%;
-    }
-    .camera-left-col {
-      width: 100%;
-    }
-    .controls-right-col {
-      width: 100%; display: flex; flex-direction: column;
-    }
-
-    /* 4:3 標準橫式取景框 */
-    #cameraContainer {
-      width: 100%; border-radius: 18px; overflow: hidden;
-      background: #1E2420; position: relative;
-      margin-bottom: 10px; border: 2.5px solid #9CC49E;
-      aspect-ratio: 4 / 3;
-      display: flex; align-items: center; justify-content: center;
-    }
-    #cameraVideo {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-    }
-    #flashOverlay {
-      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      background: #FFFFFF; opacity: 0; pointer-events: none; transition: opacity 0.12s;
-    }
-    .landscape-guide {
-      position: absolute; bottom: 8px; right: 10px;
-      background: rgba(0, 0, 0, 0.55); color: #FFFFFF;
-      font-size: 11px; padding: 3px 8px; border-radius: 8px;
-      pointer-events: none;
-    }
-
-    /* 當手機橫拿 (Landscape) 時，自動切換為「左鏡頭、右快門」橫向相機介面 */
-    @media (orientation: landscape) {
-      body { padding: 6px; }
-      #pageShooting.card {
-        max-width: 98vw; height: 94vh; padding: 12px 16px; margin: 0;
-        display: flex; flex-direction: column; justify-content: center;
-      }
-      .shooting-layout {
-        flex-direction: row; gap: 14px; align-items: center; height: calc(100% - 48px);
-      }
-      .camera-left-col {
-        flex: 1.35; height: 100%; display: flex; align-items: center; justify-content: center;
-      }
-      #cameraContainer {
-        margin-bottom: 0; max-height: 100%; width: auto; height: 100%; aspect-ratio: 4 / 3;
-      }
-      .controls-right-col {
-        flex: 1; height: 100%; justify-content: center; overflow-y: auto;
-      }
-    }
-
-    /* 若手機鎖定直向，點選「強制橫向介面」時旋轉畫面 90 度 */
-    body.force-landscape #pageShooting {
-      position: fixed; top: 50%; left: 50%;
-      width: 94vh; height: 94vw; max-width: none;
-      transform: translate(-50%, -50%) rotate(90deg);
-      z-index: 999; margin: 0; padding: 12px 16px;
-      display: flex; flex-direction: column;
-    }
-    body.force-landscape .shooting-layout {
-      flex-direction: row; gap: 14px; align-items: center; height: calc(100% - 48px);
-    }
-    body.force-landscape .camera-left-col {
-      flex: 1.35; height: 100%; display: flex; align-items: center; justify-content: center;
-    }
-    body.force-landscape #cameraContainer {
-      margin-bottom: 0; height: 100%; width: auto; aspect-ratio: 4 / 3;
-    }
-    body.force-landscape .controls-right-col {
-      flex: 1; height: 100%; justify-content: center;
-    }
-
-    /* 暖杏橘色超大快門按鈕 */
     .btn-orange-huge {
-      width: 100%; padding: 18px 14px; border-radius: 30px; border: none;
+      width: 100%; padding: 17px 14px; border-radius: 30px; border: none;
       background: linear-gradient(135deg, #FAD09C 0%, #F0A35E 100%);
       background-size: cover;
       color: #FFFFFF; font-size: 20px; font-weight: bold;
       text-shadow: 0 1px 3px rgba(150, 75, 15, 0.35);
       box-shadow: 0 7px 16px rgba(240, 163, 94, 0.45);
-      cursor: pointer; margin-bottom: 8px; display: block; text-align: center;
+      cursor: pointer; margin-bottom: 10px; display: block; text-align: center;
       user-select: none;
     }
-    .btn-orange-huge:active { transform: scale(0.96); }
+    .btn-orange-huge:active { transform: scale(0.97); }
 
-    /* 嫩芽綠「確認拍攝結束」大按鈕 */
-    .btn-finish-group {
-      width: 100%; padding: 14px; border-radius: 26px;
-      border: 2px solid #78AD80;
-      background: linear-gradient(135deg, #A8D4AD 0%, #7BB383 100%);
+    /* 第一頁相簿上傳按鈕 */
+    .btn-blue-home {
+      width: 100%; padding: 13px 14px; border-radius: 26px;
+      border: 1.5px solid #8CC2DE;
+      background: linear-gradient(135deg, #D0ECFA 0%, #9BCDE6 100%);
       background-size: cover;
-      color: #FFFFFF; font-size: 17px; font-weight: bold;
-      text-shadow: 0 1px 2px rgba(40, 90, 50, 0.3);
-      box-shadow: 0 5px 12px rgba(123, 179, 131, 0.38);
+      color: #1A3E52; font-size: 15px; font-weight: bold;
+      box-shadow: 0 4px 12px rgba(135, 190, 220, 0.3);
       cursor: pointer; display: block; text-align: center;
-      margin-bottom: 8px; user-select: none;
+      user-select: none;
     }
-    .btn-finish-group:active { transform: scale(0.98); }
+    .btn-blue-home:active { transform: scale(0.98); }
 
-    /* 晴空粉藍相簿多選按鈕 */
-    .btn-blue-sub {
-      width: 100%; padding: 10px; border-radius: 22px; border: none;
-      background: linear-gradient(135deg, #C6E7F7 0%, #9BCDE6 100%);
-      background-size: cover;
-      color: #1F4457; font-size: 13px; font-weight: bold;
-      cursor: pointer; display: block; text-align: center;
-      margin-bottom: 8px;
+    .home-status-box {
+      margin-top: 10px; padding: 9px 12px; border-radius: 14px;
+      background-color: #F0F7F0; background-size: cover;
+      border: 1px solid #CDE3CF; color: #2E5E38;
+      font-size: 13px; font-weight: bold; text-align: center;
+      display: none;
     }
 
-    /* 已拍照片縮圖列 */
+    input[type="file"] { display: none; }
+
+    /* ================= 【第二頁：100% 滿版全螢幕相機頁面 (紅3/5 · 藍<1/5 · 橘綠<1/5)】 ================= */
+    #pageShooting {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw;
+      height: 100dvh;
+      background-color: #FFFFFF;
+      background-size: cover;
+      z-index: 900;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .shooting-layout {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 🟥【紅框區】：最大面積取景窗 (佔全螢幕約 70%，超過 3/5) */
+    .camera-left-col {
+      flex: 1;
+      width: 100%;
+      min-height: 0;
+      position: relative;
+      background: #141815;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #cameraContainer {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #cameraVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* 浮動在取景窗頂部的半透明資訊列 (完全不佔額外版面高度) */
+    .floating-top-bar {
+      position: absolute;
+      top: max(10px, env(safe-area-inset-top));
+      left: 12px; right: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .floating-vendor-pill {
+      background: rgba(25, 38, 28, 0.68);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      color: #FFFFFF;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 16px;
+      font-weight: 900;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+    .floating-shot-pill {
+      background: rgba(255, 248, 238, 0.90);
+      color: #D96B12;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 900;
+      border: 1.5px solid #F5C492;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    #flashOverlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: #FFFFFF; opacity: 0; pointer-events: none; transition: opacity 0.12s;
+      z-index: 15;
+    }
+
+    .landscape-guide {
+      position: absolute; bottom: 8px; right: 10px;
+      background: rgba(0, 0, 0, 0.55); color: #FFFFFF;
+      font-size: 11px; padding: 3px 9px; border-radius: 10px;
+      pointer-events: none; z-index: 10;
+    }
+
+    /* 下半部控制群組 (藍框 + 底部快門列，合計小於 30%) */
+    .controls-right-col {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      background-color: #FFFFFF;
+      background-size: cover;
+      flex-shrink: 0;
+    }
+
+    /* 🟦【藍框區】：顯示小縮圖與狀態提示 (高度壓在約 10%~11%，遠小於 1/5) */
+    .blue-info-strip {
+      width: 100%;
+      height: 11dvh;
+      min-height: 52px;
+      max-height: 70px;
+      padding: 4px 12px;
+      background-color: #F4F9F5;
+      background-size: cover;
+      border-top: 1.5px solid #D5E6D7;
+      border-bottom: 1.5px solid #E4EDE5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
     .thumb-strip {
-      display: flex; gap: 6px; overflow-x: auto; padding: 2px 0;
-      margin-bottom: 6px; min-height: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      height: 100%;
+      flex: 1;
+      min-width: 0;
+      padding: 2px 0;
+    }
+    .thumb-empty-hint {
+      font-size: 12px;
+      color: #7A9480;
+      font-weight: bold;
+      white-space: nowrap;
     }
     .thumb-item {
-      width: 64px; height: 48px; border-radius: 8px; object-fit: cover;
-      border: 2px solid #88B88E; flex-shrink: 0;
+      width: 56px;
+      height: 42px;
+      border-radius: 7px;
+      object-fit: cover;
+      border: 2px solid #78B280;
+      flex-shrink: 0;
     }
 
     .status-box {
-      font-size: 12px; font-weight: bold; text-align: center;
-      padding: 8px; border-radius: 12px;
-      background-color: #F0F7F0; background-size: cover; color: #356640;
-      border: 1px solid #CDE3CF;
+      font-size: 12px;
+      font-weight: bold;
+      text-align: right;
+      padding: 6px 10px;
+      border-radius: 12px;
+      background-color: #E8F4EA;
+      background-size: cover;
+      color: #285A34;
+      border: 1px solid #C2DEC5;
+      max-width: 54%;
+      line-height: 1.3;
+      flex-shrink: 0;
     }
-    .log-list { font-size: 11px; color: #3A6644; margin-top: 6px; line-height: 1.5; max-height: 65px; overflow-y: auto; }
-    input[type="file"] { display: none; }
+
+    /* 🟧＋🟩【底部控制區】：綠框返回 Icon ＋ 橘框亮橘圓形快門 ＋ 橫向切換 (高度壓在約 17%，小於 1/5) */
+    .bottom-control-bar {
+      width: 100%;
+      height: 17dvh;
+      min-height: 86px;
+      max-height: 115px;
+      padding: 6px 24px calc(6px + env(safe-area-inset-bottom)) 24px;
+      background-color: #FFFFFF;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* 🟩【綠框區】：方框中間帶返回箭頭 Icon */
+    .side-action-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      user-select: none;
+      width: 68px;
+    }
+    .btn-back-square {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background-color: #EBF7EC;
+      background-size: cover;
+      border: 2.2px solid #5EA869;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px rgba(94, 168, 105, 0.22);
+      transition: transform 0.1s;
+    }
+    .side-action-wrap:active .btn-back-square,
+    .side-action-wrap:active .btn-rotate-square {
+      transform: scale(0.92);
+    }
+    .side-action-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: #36583D;
+      white-space: nowrap;
+    }
+
+    /* 🟧【橘框區】：亮橘色雙層圓形快門鈕 */
+    .shutter-outer-ring {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      border: 4px solid #F58820;
+      background-color: #FFF7F0;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(245, 136, 32, 0.42);
+      user-select: none;
+      transition: transform 0.08s;
+      flex-shrink: 0;
+    }
+    .shutter-outer-ring:active {
+      transform: scale(0.91);
+    }
+    .shutter-inner-circle {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FFB347 0%, #F27405 100%);
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.45);
+    }
+    .shutter-center-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2.5px solid #FFFFFF;
+      opacity: 0.92;
+    }
+
+    /* 右側對稱：橫向切換方框鈕 */
+    .btn-rotate-square {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background-color: #EBF4FA;
+      background-size: cover;
+      border: 2px solid #7EB6D9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px rgba(126, 182, 217, 0.22);
+      transition: transform 0.1s;
+    }
+
+    /* ================= 手機橫拿或點選「橫向切換」時的左右分欄佈局 ================= */
+    @media (orientation: landscape) {
+      #pageShooting .shooting-layout {
+        flex-direction: row;
+      }
+      #pageShooting .camera-left-col {
+        flex: 1;
+        height: 100%;
+      }
+      #pageShooting .controls-right-col {
+        width: 26vw;
+        min-width: 175px;
+        max-width: 230px;
+        height: 100%;
+        border-left: 2px solid #DCE8DD;
+        justify-content: space-between;
+      }
+      #pageShooting .blue-info-strip {
+        height: auto;
+        max-height: none;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 8px 10px;
+        gap: 6px;
+        flex: 0 0 auto;
+      }
+      #pageShooting .thumb-strip {
+        height: 48px;
+      }
+      #pageShooting .status-box {
+        max-width: 100%;
+        text-align: center;
+      }
+      #pageShooting .bottom-control-bar {
+        flex: 1;
+        height: auto;
+        max-height: none;
+        flex-direction: column-reverse;
+        justify-content: space-evenly;
+        padding: 10px;
+      }
+    }
+
+    body.force-landscape #pageShooting {
+      position: fixed;
+      top: 50%; left: 50%;
+      width: 100dvh;
+      height: 100vw;
+      transform: translate(-50%, -50%) rotate(90deg);
+      z-index: 999;
+    }
+    body.force-landscape #pageShooting .shooting-layout {
+      flex-direction: row;
+    }
+    body.force-landscape #pageShooting .camera-left-col {
+      flex: 1;
+      height: 100%;
+    }
+    body.force-landscape #pageShooting .controls-right-col {
+      width: 26vh;
+      min-width: 175px;
+      max-width: 230px;
+      height: 100%;
+      border-left: 2px solid #DCE8DD;
+      justify-content: space-between;
+    }
+    body.force-landscape #pageShooting .blue-info-strip {
+      height: auto;
+      max-height: none;
+      flex-direction: column;
+      align-items: stretch;
+      padding: 8px 10px;
+      gap: 6px;
+    }
+    body.force-landscape #pageShooting .thumb-strip {
+      height: 48px;
+    }
+    body.force-landscape #pageShooting .status-box {
+      max-width: 100%;
+      text-align: center;
+    }
+    body.force-landscape #pageShooting .bottom-control-bar {
+      flex: 1;
+      height: auto;
+      max-height: none;
+      flex-direction: column-reverse;
+      justify-content: space-evenly;
+      padding: 10px;
+    }
   </style>
 </head>
 <body>
@@ -296,46 +538,77 @@
       </div>
     </div>
 
+    <!-- 進入相機連拍按鈕 -->
     <div id="btnStartShoot" class="btn-orange-huge" onclick="startGroupShooting()">📷 開始拍攝這組工班 (橫式)</div>
+
+    <!-- 移至第一頁的相簿多選上傳按鈕 -->
+    <div id="btnGalleryHome" class="btn-blue-home" onclick="triggerHomeGallery()">🖼️ 或從相簿勾選橫式照片直接上傳</div>
+    <input type="file" id="galleryInput" accept="image/*" multiple onchange="handleGalleryFiles(this.files)">
+
+    <!-- 第一頁相簿上傳進度提示 -->
+    <div id="homeStatusBox" class="home-status-box"></div>
   </div>
 
-  <!-- ================= 【第二頁：橫向常駐鏡頭連拍介面】 ================= -->
-  <div id="pageShooting" class="card" style="display:none;">
-    <div id="vendorBanner" class="Current-vendor-banner">
-      <div id="shootingVendorTitle" class="vendor-big-name">👷 弘佾 (日班)</div>
-      <div style="display:flex; gap:6px; align-items:center;">
-        <div id="shotCounterText" class="shot-counter-badge">📸 已拍 0 張</div>
-        <div class="rotate-btn" onclick="toggleForceLandscape()">🔄 橫向介面</div>
-      </div>
-    </div>
-
+  <!-- ================= 【第二頁：滿版大取景框連拍介面】 ================= -->
+  <div id="pageShooting">
     <div class="shooting-layout">
-      <!-- 左側：4:3 橫式即時相機鏡頭 -->
+      <!-- 🟥【紅框區】：最大面積取景窗 (佔比約 70%) -->
       <div class="camera-left-col">
         <div id="cameraContainer">
+          <div class="floating-top-bar">
+            <div id="shootingVendorTitle" class="floating-vendor-pill">👷 弘佾 (日班)</div>
+            <div id="shotCounterText" class="floating-shot-pill">📸 已拍 0 張</div>
+          </div>
+
           <video id="cameraVideo" autoplay playsinline muted></video>
           <div id="flashOverlay"></div>
           <div class="landscape-guide">📐 4:3 橫式 ＋ EXIF 保留</div>
         </div>
       </div>
 
-      <!-- 右側：快門、結束按鈕與縮圖狀態 -->
-      <div class="controls-right-col">
-        <div id="thumbStrip" class="thumb-strip"></div>
-
-        <div id="shutterBtn" class="btn-orange-huge" onclick="takeInstantShot()">
-          📸 按下快門連拍 (拍第 1 張)
+      <!-- 下方控制群組 (藍框 + 底部快門與返回區) -->
+      <div id="controlsRightCol" class="controls-right-col">
+        <!-- 🟦【藍框區】：左側小縮圖 ＋ 右側狀態提示 (小於 1/5) -->
+        <div id="blueInfoStrip" class="blue-info-strip">
+          <div id="thumbStrip" class="thumb-strip">
+            <span class="thumb-empty-hint">📷 按下方橘色圓鈕連拍</span>
+          </div>
+          <div id="statusBox" class="status-box">🟢 自動壓印日期＋EXIF</div>
         </div>
 
-        <div id="btnFinishGroup" class="btn-finish-group" onclick="finishGroupAndReturn()">
-          ✅ 確認這組工班拍攝結束 (返回)
+        <!-- 🟧＋🟩【底部控制區】：綠框返回Icon ＋ 橘框亮橘圓形快門 ＋ 橫向切換 (小於 1/5) -->
+        <div id="bottomControlBar" class="bottom-control-bar">
+          <!-- 🟩 綠框：方框中間帶返回箭頭 Icon (返回首頁) -->
+          <div class="side-action-wrap" onclick="finishGroupAndReturn()" title="完成並返回首頁">
+            <div id="btnFinishGroup" class="btn-back-square">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2E6F3A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="4" ry="4" stroke-opacity="0.35"></rect>
+                <path d="M15 12H8"></path>
+                <path d="M11.5 8.5L8 12l3.5 3.5"></path>
+              </svg>
+            </div>
+            <span class="side-action-label">返回首頁</span>
+          </div>
+
+          <!-- 🟧 橘框：亮橘色雙層圓形快門鈕 -->
+          <div id="shutterBtn" class="shutter-outer-ring" onclick="takeInstantShot()" title="按下快門連拍">
+            <div id="shutterInner" class="shutter-inner-circle">
+              <div class="shutter-center-dot"></div>
+            </div>
+          </div>
+
+          <!-- 右側對稱：橫向切換方框 Icon -->
+          <div class="side-action-wrap" onclick="toggleForceLandscape()" title="切換橫向介面">
+            <div id="btnRotateSquare" class="btn-rotate-square">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#24526E" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="6" width="16" height="12" rx="2.5"></rect>
+                <path d="M9 12h6"></path>
+                <path d="M13 9.5L15.5 12 13 14.5"></path>
+              </svg>
+            </div>
+            <span class="side-action-label">橫向介面</span>
+          </div>
         </div>
-
-        <label id="btnGallerySub" class="btn-blue-sub" for="galleryInput">🖼️ 或從相簿勾選橫式照片上傳</label>
-        <input type="file" id="galleryInput" accept="image/*" multiple onchange="handleGalleryFiles(this.files)">
-
-        <div id="statusBox" class="status-box">🟢 自動壓印日期並寫入 EXIF 拍攝時間！</div>
-        <div id="logList" class="log-list"></div>
       </div>
     </div>
   </div>
@@ -343,7 +616,7 @@
   <canvas id="watermarkCanvas" style="display:none;"></canvas>
 
   <script>
-    // ✅ 已填入您專屬的 Google Apps Script 網址
+    // ✅ 您專屬的 Google Apps Script 網址
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxRi29SB802ZJSssGKp8Ki6-g-dx3VvVVkMO857_kum88V-FC2KhEqCj4IZKMPcYQcn/exec";
 
     // 預設基準廠商清單 (含 NAS 內的「力陞」共 19 家)
@@ -376,17 +649,21 @@
       document.body.style.backgroundImage = makeGradientPng("#F4F2EC", "#F4F2EC");
       document.getElementById("pageSelectVendor").style.backgroundImage = makeGradientPng("#D2EBD0", "#C2E5F5");
       document.getElementById("pageShooting").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
+      document.getElementById("controlsRightCol").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
+      document.getElementById("blueInfoStrip").style.backgroundImage = makeGradientPng("#F4F9F5", "#F4F9F5");
+      document.getElementById("bottomControlBar").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
       document.getElementById("photoTypeSelect").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
       document.getElementById("vendorSelect").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
       document.getElementById("customVendorInput").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
       document.getElementById("shiftBtn").style.backgroundImage = makeGradientPng("#FFF9EC", "#FFF9EC");
       document.getElementById("btnStartShoot").style.backgroundImage = makeGradientPng("#FAD09C", "#F0A35E");
-      document.getElementById("shutterBtn").style.backgroundImage = makeGradientPng("#FAD09C", "#F0A35E");
-      document.getElementById("btnGallerySub").style.backgroundImage = makeGradientPng("#C6E7F7", "#9BCDE6");
-      document.getElementById("btnFinishGroup").style.backgroundImage = makeGradientPng("#A8D4AD", "#7BB383");
-      document.getElementById("vendorBanner").style.backgroundImage = makeGradientPng("#EEF7EE", "#EEF7EE");
-      document.getElementById("shotCounterText").style.backgroundImage = makeGradientPng("#FFFFFF", "#FFFFFF");
-      document.getElementById("statusBox").style.backgroundImage = makeGradientPng("#F0F7F0", "#F0F7F0");
+      document.getElementById("btnGalleryHome").style.backgroundImage = makeGradientPng("#D0ECFA", "#9BCDE6");
+      document.getElementById("homeStatusBox").style.backgroundImage = makeGradientPng("#F0F7F0", "#F0F7F0");
+      document.getElementById("shutterBtn").style.backgroundImage = makeGradientPng("#FFF7F0", "#FFF7F0");
+      document.getElementById("shutterInner").style.backgroundImage = makeGradientPng("#FFB347", "#F27405");
+      document.getElementById("btnFinishGroup").style.backgroundImage = makeGradientPng("#EBF7EC", "#D8F0DA");
+      document.getElementById("btnRotateSquare").style.backgroundImage = makeGradientPng("#EBF4FA", "#DAECF7");
+      document.getElementById("statusBox").style.backgroundImage = makeGradientPng("#E8F4EA", "#E8F4EA");
     }
 
     // ================= [廠商清單渲染與雲端 NAS 自動同步] =================
@@ -464,7 +741,7 @@
           renderVendorOptions(res.vendors);
           if (badge) badge.innerText = `☁️ 已同步 NAS (${res.vendors.length}家)`;
         } else {
-          if (badge) badge.innerText = "☁️ 離線快取清單";
+          if (badge) badge.innerText = "☁️ 已載入廠商清單";
         }
       })
       .catch(() => {
@@ -476,7 +753,6 @@
       const cleanName = String(newVendorName || "").trim();
       if (!cleanName || cleanName === "__CUSTOM__" || cleanName === "鼠患檢查") return;
 
-      // 先在手機本地選單立即加入並選取該新廠商
       const currentList = getCachedVendorList();
       if (currentList.indexOf(cleanName) === -1) {
         currentList.push(cleanName);
@@ -487,7 +763,6 @@
       const badge = document.getElementById("vendorSyncBadge");
       if (badge) badge.innerText = `☁️ 正在同步「${cleanName}」...`;
 
-      // 非阻塞背景通知雲端與 NAS 建立該廠商資料夾并同步給所有人的手機
       fetch(GAS_WEB_APP_URL, {
         method: "POST",
         body: JSON.stringify({
@@ -507,11 +782,9 @@
 
     window.onload = function() {
       applyBrightThemeBitmaps();
-      // 1. 先瞬間載入本地快取清單與上次選取的廠商
       const cachedList = getCachedVendorList();
       const savedVendor = localStorage.getItem("wb_last_vendor");
       renderVendorOptions(cachedList, savedVendor);
-      // 2. 背景向 GAS 雲端拉取與電腦 NAS 同步的最新廠商清單
       syncVendorsFromCloud();
     };
 
@@ -571,6 +844,21 @@
       return sel;
     }
 
+    function triggerHomeGallery() {
+      const isCustomSelected = (currentPhotoType === "WORKER" && document.getElementById("vendorSelect").value === "__CUSTOM__");
+      const vendor = getSelectedVendor();
+      if (!vendor) {
+        alert("請先選擇或輸入廠商名稱，再從相簿選圖！");
+        return;
+      }
+      if (isCustomSelected) {
+        pushNewVendorToCloud(vendor);
+      } else if (currentPhotoType === "WORKER") {
+        localStorage.setItem("wb_last_vendor", vendor);
+      }
+      document.getElementById("galleryInput").click();
+    }
+
     async function startGroupShooting() {
       const isCustomSelected = (currentPhotoType === "WORKER" && document.getElementById("vendorSelect").value === "__CUSTOM__");
       const vendor = getSelectedVendor();
@@ -579,7 +867,6 @@
         return;
       }
 
-      // 若是手動輸入的新廠商，立即加入選單並自動同步至雲端與 NAS
       if (isCustomSelected) {
         pushNewVendorToCloud(vendor);
       } else if (currentPhotoType === "WORKER") {
@@ -588,20 +875,18 @@
 
       currentGroupShots = 0;
       groupBaseEpochMs = Date.now();
-      document.getElementById("thumbStrip").innerHTML = "";
+      document.getElementById("thumbStrip").innerHTML = '<span class="thumb-empty-hint">📷 按下方橘色圓鈕連拍</span>';
 
       if (currentPhotoType === "RAT") {
         document.getElementById("shootingVendorTitle").innerText = "🐭 鼠患防治檢查";
-        document.getElementById("btnFinishGroup").innerText = "✅ 鼠患檢查拍攝結束 (返回首頁)";
       } else {
         const shiftStr = isNightMode ? "夜班" : "日班";
         document.getElementById("shootingVendorTitle").innerText = `👷 ${vendor} (${shiftStr})`;
-        document.getElementById("btnFinishGroup").innerText = "✅ 確認這組工班拍攝結束 (返回選廠商)";
       }
       updateShootingUI();
 
       document.getElementById("pageSelectVendor").style.display = "none";
-      document.getElementById("pageShooting").style.display = "block";
+      document.getElementById("pageShooting").style.display = "flex";
 
       try {
         if (screen.orientation && screen.orientation.lock) {
@@ -628,13 +913,11 @@
       groupBaseEpochMs = null;
       document.getElementById("pageShooting").style.display = "none";
       document.getElementById("pageSelectVendor").style.display = "block";
-      // 返回選廠商頁面時，自動在背景同步一次最新雲端/NAS廠商清單
       syncVendorsFromCloud();
     }
 
     function updateShootingUI() {
       document.getElementById("shotCounterText").innerText = `📸 已拍 ${currentGroupShots} 張`;
-      document.getElementById("shutterBtn").innerText = `📸 按下快門連拍 (拍第 ${currentGroupShots + 1} 張)`;
     }
 
     function formatTaiwanTimeStr(epochMs) {
@@ -659,7 +942,6 @@
         const hh = String(twDate.getUTCHours()).padStart(2, '0');
         const min = String(twDate.getUTCMinutes()).padStart(2, '0');
         const ss = String(twDate.getUTCSeconds()).padStart(2, '0');
-        // EXIF 標準時間格式：YYYY:MM:DD HH:MM:SS
         const exifTimeStr = `${yyyy}:${mm}:${dd} ${hh}:${min}:${ss}`;
 
         const zeroth = {};
@@ -751,6 +1033,16 @@
       queueUpload(rawJpegBase64);
     }
 
+    function updateStatusDisplay(msg) {
+      const statusBox = document.getElementById("statusBox");
+      const homeStatusBox = document.getElementById("homeStatusBox");
+      if (statusBox) statusBox.innerText = msg;
+      if (homeStatusBox) {
+        homeStatusBox.style.display = "block";
+        homeStatusBox.innerText = msg;
+      }
+    }
+
     function queueUpload(rawJpegBase64) {
       const vendor = getSelectedVendor();
       const pType = currentPhotoType;
@@ -759,26 +1051,26 @@
       currentGroupShots++;
       const shotNum = currentGroupShots;
 
-      // 計算本張照片的鎖定時間毫秒數，並同時用於「檔名」與「EXIF 內部拍攝時間」！
+      // 計算本張照片的鎖定時間毫秒數，並同時用於「檔名」與「EXIF 內部拍攝時間」
       const shotEpochMs = (pType === "WORKER") ? (groupBaseEpochMs + (shotNum - 1) * 1000) : (Date.now() + shotNum * 100);
       const lockedTimeStr = formatTaiwanTimeStr(shotEpochMs);
 
-      // 將 EXIF (DateTimeOriginal) 寫入 JPG 二進位資料中
       const watermarkedWithExifBase64 = injectExifDateTime(rawJpegBase64, shotEpochMs);
 
       updateShootingUI();
 
       const thumbStrip = document.getElementById("thumbStrip");
+      const hintEl = thumbStrip.querySelector(".thumb-empty-hint");
+      if (hintEl) hintEl.remove();
+
       const thumb = document.createElement("img");
       thumb.className = "thumb-item";
       thumb.src = watermarkedWithExifBase64;
       thumbStrip.appendChild(thumb);
       thumbStrip.scrollLeft = thumbStrip.scrollWidth;
 
-      const statusBox = document.getElementById("statusBox");
-      const logList = document.getElementById("logList");
       activeUploads++;
-      statusBox.innerText = `⏳ 背景上傳中 (尚有 ${activeUploads} 張)... 可直接繼續拍下一張！`;
+      updateStatusDisplay(`⏳ 上傳中 (尚有 ${activeUploads} 張)...`);
 
       fetch(GAS_WEB_APP_URL, {
         method: "POST",
@@ -798,18 +1090,17 @@
             renderVendorOptions(res.vendors, pType === "WORKER" ? vendor : null);
           }
           if (activeUploads === 0) {
-            statusBox.innerText = `✅ 第 ${shotNum} 張 (含 EXIF) 已安全存入雲端！`;
+            updateStatusDisplay(`✅ 第 ${shotNum} 張已存入雲端！`);
           } else {
-            statusBox.innerText = `⏳ 背景上傳中 (尚有 ${activeUploads} 張)...`;
+            updateStatusDisplay(`⏳ 上傳中 (尚有 ${activeUploads} 張)...`);
           }
-          logList.innerHTML = `<div>🟢 [第${shotNum}張] <b>${res.vendor}</b> / ${res.fileName} (含EXIF)</div>` + logList.innerHTML;
         } else {
-          statusBox.innerText = `❌ 上傳失敗：${res ? res.error : ''}`;
+          updateStatusDisplay(`❌ 失敗：${res ? res.error : ''}`);
         }
       })
-      .catch(err => {
+      .catch(() => {
         activeUploads = Math.max(0, activeUploads - 1);
-        statusBox.innerText = `❌ 網路錯誤：${err}`;
+        updateStatusDisplay(`❌ 網路異常，請重試`);
       });
     }
 
@@ -817,6 +1108,7 @@
       if (!files || files.length === 0) return;
       const fileList = Array.from(files);
       document.getElementById("galleryInput").value = "";
+      groupBaseEpochMs = Date.now();
 
       fileList.forEach(file => {
         const reader = new FileReader();
@@ -834,4 +1126,3 @@
   </script>
 </body>
 </html>
---- END OF FILE index.html ---
