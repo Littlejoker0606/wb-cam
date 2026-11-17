@@ -124,7 +124,7 @@
 
     input[type="file"] { display: none; }
 
-    /* ================= 【第二頁：100% 滿版全螢幕相機頁面 (紅3/5 · 藍<1/5 · 橘綠<1/5)】 ================= */
+    /* ================= 【第二頁：100% 滿版全螢幕相機頁面 (固定直式UI · 智慧轉正照片)】 ================= */
     #pageShooting {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -175,7 +175,7 @@
       display: block;
     }
 
-    /* 浮動在取景窗頂部的半透明資訊列 (完全不佔額外版面高度) */
+    /* 浮動在取景窗頂部的半透明資訊列 */
     .floating-top-bar {
       position: absolute;
       top: max(10px, env(safe-area-inset-top));
@@ -199,7 +199,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.25);
     }
     .floating-shot-pill {
-      background: rgba(255, 248, 238, 0.90);
+      background: rgba(255, 248, 238, 0.92);
       color: #D96B12;
       padding: 5px 12px;
       border-radius: 20px;
@@ -217,9 +217,10 @@
 
     .landscape-guide {
       position: absolute; bottom: 8px; right: 10px;
-      background: rgba(0, 0, 0, 0.55); color: #FFFFFF;
-      font-size: 11px; padding: 3px 9px; border-radius: 10px;
+      background: rgba(0, 0, 0, 0.62); color: #FFFFFF;
+      font-size: 12px; font-weight: bold; padding: 4px 10px; border-radius: 10px;
       pointer-events: none; z-index: 10;
+      border: 1px solid rgba(255, 255, 255, 0.25);
     }
 
     /* 下半部控制群組 (藍框 + 底部快門列，合計小於 30%) */
@@ -232,7 +233,7 @@
       flex-shrink: 0;
     }
 
-    /* 🟦【藍框區】：顯示小縮圖與狀態提示 (高度壓在約 10%~11%，遠小於 1/5) */
+    /* 🟦【藍框區】：顯示小縮圖與狀態提示 (高度壓在約 11%，小於 1/5) */
     .blue-info-strip {
       width: 100%;
       height: 11dvh;
@@ -266,8 +267,9 @@
       white-space: nowrap;
     }
     .thumb-item {
-      width: 56px;
       height: 42px;
+      width: auto;
+      max-width: 60px;
       border-radius: 7px;
       object-fit: cover;
       border: 2px solid #78B280;
@@ -289,7 +291,7 @@
       flex-shrink: 0;
     }
 
-    /* 🟧＋🟩【底部控制區】：綠框返回 Icon ＋ 橘框亮橘圓形快門 ＋ 橫向切換 (高度壓在約 17%，小於 1/5) */
+    /* 🟧＋🟩【底部控制區】：綠框返回 Icon ＋ 橘框亮橘圓形快門 ＋ 拍攝方向切換 (高度約 17%，小於 1/5) */
     .bottom-control-bar {
       width: 100%;
       height: 17dvh;
@@ -312,7 +314,7 @@
       gap: 3px;
       cursor: pointer;
       user-select: none;
-      width: 68px;
+      width: 78px;
     }
     .btn-back-square {
       width: 48px;
@@ -377,7 +379,7 @@
       opacity: 0.92;
     }
 
-    /* 右側對稱：橫向切換方框鈕 */
+    /* 右側對稱：照片方向自動/切換方框鈕 */
     .btn-rotate-square {
       width: 48px;
       height: 48px;
@@ -390,96 +392,6 @@
       justify-content: center;
       box-shadow: 0 3px 10px rgba(126, 182, 217, 0.22);
       transition: transform 0.1s;
-    }
-
-    /* ================= 手機橫拿或點選「橫向切換」時的左右分欄佈局 ================= */
-    @media (orientation: landscape) {
-      #pageShooting .shooting-layout {
-        flex-direction: row;
-      }
-      #pageShooting .camera-left-col {
-        flex: 1;
-        height: 100%;
-      }
-      #pageShooting .controls-right-col {
-        width: 26vw;
-        min-width: 175px;
-        max-width: 230px;
-        height: 100%;
-        border-left: 2px solid #DCE8DD;
-        justify-content: space-between;
-      }
-      #pageShooting .blue-info-strip {
-        height: auto;
-        max-height: none;
-        flex-direction: column;
-        align-items: stretch;
-        padding: 8px 10px;
-        gap: 6px;
-        flex: 0 0 auto;
-      }
-      #pageShooting .thumb-strip {
-        height: 48px;
-      }
-      #pageShooting .status-box {
-        max-width: 100%;
-        text-align: center;
-      }
-      #pageShooting .bottom-control-bar {
-        flex: 1;
-        height: auto;
-        max-height: none;
-        flex-direction: column-reverse;
-        justify-content: space-evenly;
-        padding: 10px;
-      }
-    }
-
-    body.force-landscape #pageShooting {
-      position: fixed;
-      top: 50%; left: 50%;
-      width: 100dvh;
-      height: 100vw;
-      transform: translate(-50%, -50%) rotate(90deg);
-      z-index: 999;
-    }
-    body.force-landscape #pageShooting .shooting-layout {
-      flex-direction: row;
-    }
-    body.force-landscape #pageShooting .camera-left-col {
-      flex: 1;
-      height: 100%;
-    }
-    body.force-landscape #pageShooting .controls-right-col {
-      width: 26vh;
-      min-width: 175px;
-      max-width: 230px;
-      height: 100%;
-      border-left: 2px solid #DCE8DD;
-      justify-content: space-between;
-    }
-    body.force-landscape #pageShooting .blue-info-strip {
-      height: auto;
-      max-height: none;
-      flex-direction: column;
-      align-items: stretch;
-      padding: 8px 10px;
-      gap: 6px;
-    }
-    body.force-landscape #pageShooting .thumb-strip {
-      height: 48px;
-    }
-    body.force-landscape #pageShooting .status-box {
-      max-width: 100%;
-      text-align: center;
-    }
-    body.force-landscape #pageShooting .bottom-control-bar {
-      flex: 1;
-      height: auto;
-      max-height: none;
-      flex-direction: column-reverse;
-      justify-content: space-evenly;
-      padding: 10px;
     }
   </style>
 </head>
@@ -539,10 +451,10 @@
     </div>
 
     <!-- 進入相機連拍按鈕 -->
-    <div id="btnStartShoot" class="btn-orange-huge" onclick="startGroupShooting()">📷 開始拍攝這組工班 (橫式)</div>
+    <div id="btnStartShoot" class="btn-orange-huge" onclick="startGroupShooting()">📷 開始拍攝這組工班</div>
 
     <!-- 移至第一頁的相簿多選上傳按鈕 -->
-    <div id="btnGalleryHome" class="btn-blue-home" onclick="triggerHomeGallery()">🖼️ 或從相簿勾選橫式照片直接上傳</div>
+    <div id="btnGalleryHome" class="btn-blue-home" onclick="triggerHomeGallery()">🖼️ 或從相簿勾選照片直接上傳</div>
     <input type="file" id="galleryInput" accept="image/*" multiple onchange="handleGalleryFiles(this.files)">
 
     <!-- 第一頁相簿上傳進度提示 -->
@@ -562,7 +474,7 @@
 
           <video id="cameraVideo" autoplay playsinline muted></video>
           <div id="flashOverlay"></div>
-          <div class="landscape-guide">📐 4:3 橫式 ＋ EXIF 保留</div>
+          <div id="poseGuideBadge" class="landscape-guide">📐 自動方向：橫拍(頂朝左)</div>
         </div>
       </div>
 
@@ -576,7 +488,7 @@
           <div id="statusBox" class="status-box">🟢 自動壓印日期＋EXIF</div>
         </div>
 
-        <!-- 🟧＋🟩【底部控制區】：綠框返回Icon ＋ 橘框亮橘圓形快門 ＋ 橫向切換 (小於 1/5) -->
+        <!-- 🟧＋🟩【底部控制區】：綠框返回Icon ＋ 橘框亮橘圓形快門 ＋ 方向切換 (小於 1/5) -->
         <div id="bottomControlBar" class="bottom-control-bar">
           <!-- 🟩 綠框：方框中間帶返回箭頭 Icon (返回首頁) -->
           <div class="side-action-wrap" onclick="finishGroupAndReturn()" title="完成並返回首頁">
@@ -597,8 +509,8 @@
             </div>
           </div>
 
-          <!-- 右側對稱：橫向切換方框 Icon -->
-          <div class="side-action-wrap" onclick="toggleForceLandscape()" title="切換橫向介面">
+          <!-- 右側對稱：照片方向自動偵測 / 手動切換鈕 -->
+          <div class="side-action-wrap" onclick="cyclePhotoPoseMode()" title="切換照片方向模式">
             <div id="btnRotateSquare" class="btn-rotate-square">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#24526E" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="4" y="6" width="16" height="12" rx="2.5"></rect>
@@ -606,13 +518,15 @@
                 <path d="M13 9.5L15.5 12 13 14.5"></path>
               </svg>
             </div>
-            <span class="side-action-label">橫向介面</span>
+            <span id="poseModeLabel" class="side-action-label">自動方向</span>
           </div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- 畫面旋轉暫存與最終輸出 Canvas -->
+  <canvas id="orientCanvas" style="display:none;"></canvas>
   <canvas id="watermarkCanvas" style="display:none;"></canvas>
 
   <script>
@@ -632,6 +546,13 @@
     let groupBaseEpochMs = null;
     let activeUploads = 0;
     let videoStream = null;
+
+    // 🌟 智慧照片方向偵測與控制狀態
+    // photoPoseMode: "AUTO" (自動重力感應) | "LANDSCAPE_LEFT" (橫拿頂朝左) | "PORTRAIT" (直拿) | "LANDSCAPE_RIGHT" (橫拿頂朝右)
+    let photoPoseMode = "AUTO";
+    // 當處於 AUTO 模式時，重力感應器即時判別出的握持姿勢 (若瀏覽器阻擋感應器，預設為最常見的 LANDSCAPE_LEFT)
+    let detectedPhysicalPose = "LANDSCAPE_LEFT";
+    let orientationListenerInitialized = false;
 
     function makeGradientPng(c1, c2) {
       const c = document.createElement("canvas");
@@ -664,6 +585,83 @@
       document.getElementById("btnFinishGroup").style.backgroundImage = makeGradientPng("#EBF7EC", "#D8F0DA");
       document.getElementById("btnRotateSquare").style.backgroundImage = makeGradientPng("#EBF4FA", "#DAECF7");
       document.getElementById("statusBox").style.backgroundImage = makeGradientPng("#E8F4EA", "#E8F4EA");
+    }
+
+    // ================= [重力感應器：無懼「螢幕直向鎖定」即時判斷手機握持方向] =================
+    function initOrientationSensor() {
+      if (orientationListenerInitialized) return;
+
+      const handleOrientation = function(e) {
+        if (e.beta === null || e.gamma === null) return;
+        const radBeta = e.beta * (Math.PI / 180);
+        const radGamma = e.gamma * (Math.PI / 180);
+
+        // 計算重力在手機螢幕平面上的分量 (gx: 左右軸, gy: 上下軸)，無懼超過90度翻轉
+        const gx = -Math.cos(radBeta) * Math.sin(radGamma);
+        const gy = -Math.sin(radBeta);
+
+        // 若手機平放桌面 (傾斜太小)，維持上一個有效姿勢
+        if (Math.abs(gx) < 0.30 && Math.abs(gy) < 0.30) return;
+
+        let newPose = detectedPhysicalPose;
+        if (Math.abs(gx) > Math.abs(gy) * 1.15) {
+          // 橫拿：gx > 0 代表手機頂部朝左(右手按快門)；gx < 0 代表手機頂部朝右(左手按快門)
+          newPose = (gx > 0) ? "LANDSCAPE_LEFT" : "LANDSCAPE_RIGHT";
+        } else if (Math.abs(gy) > Math.abs(gx) * 1.15) {
+          // 直拿手機
+          newPose = "PORTRAIT";
+        }
+
+        if (newPose !== detectedPhysicalPose) {
+          detectedPhysicalPose = newPose;
+          updatePoseBadgeUI();
+        }
+      };
+
+      if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+        DeviceOrientationEvent.requestPermission()
+          .then(state => {
+            if (state === "granted") {
+              window.addEventListener("deviceorientation", handleOrientation, true);
+              orientationListenerInitialized = true;
+            }
+          })
+          .catch(() => {});
+      } else if (typeof window.DeviceOrientationEvent !== "undefined") {
+        window.addEventListener("deviceorientation", handleOrientation, true);
+        orientationListenerInitialized = true;
+      }
+    }
+
+    function getEffectivePose() {
+      return (photoPoseMode === "AUTO") ? detectedPhysicalPose : photoPoseMode;
+    }
+
+    function updatePoseBadgeUI() {
+      const badge = document.getElementById("poseGuideBadge");
+      const label = document.getElementById("poseModeLabel");
+      const eff = getEffectivePose();
+
+      let poseText = "橫拍(頂朝左 4:3)";
+      if (eff === "LANDSCAPE_RIGHT") poseText = "橫拍(頂朝右 4:3)";
+      else if (eff === "PORTRAIT") poseText = "直拍(3:4直式)";
+
+      if (photoPoseMode === "AUTO") {
+        if (badge) badge.innerText = `📐 自動偵測：${poseText}`;
+        if (label) label.innerText = "自動方向";
+      } else {
+        if (badge) badge.innerText = `🔒 已鎖定：${poseText}`;
+        if (eff === "LANDSCAPE_LEFT") label.innerText = "鎖定橫(左)";
+        else if (eff === "PORTRAIT") label.innerText = "鎖定直式";
+        else label.innerText = "鎖定橫(右)";
+      }
+    }
+
+    function cyclePhotoPoseMode() {
+      const modes = ["AUTO", "LANDSCAPE_LEFT", "PORTRAIT", "LANDSCAPE_RIGHT"];
+      const idx = modes.indexOf(photoPoseMode);
+      photoPoseMode = modes[(idx + 1) % modes.length];
+      updatePoseBadgeUI();
     }
 
     // ================= [廠商清單渲染與雲端 NAS 自動同步] =================
@@ -786,6 +784,7 @@
       const savedVendor = localStorage.getItem("wb_last_vendor");
       renderVendorOptions(cachedList, savedVendor);
       syncVendorsFromCloud();
+      updatePoseBadgeUI();
     };
 
     function onPhotoTypeChange() {
@@ -797,11 +796,11 @@
       if (currentPhotoType === "RAT") {
         workerBox.style.display = "none";
         ratBox.style.display = "block";
-        startBtn.innerText = "📷 開始拍攝鼠患檢查照片 (橫式)";
+        startBtn.innerText = "📷 開始拍攝鼠患檢查照片";
       } else {
         workerBox.style.display = "block";
         ratBox.style.display = "none";
-        startBtn.innerText = "📷 開始拍攝這組工班 (橫式)";
+        startBtn.innerText = "📷 開始拍攝這組工班";
       }
     }
 
@@ -829,10 +828,6 @@
         btn.style.backgroundImage = makeGradientPng("#FFF9EC", "#FFF9EC");
         btn.innerText = "☀️ 目前模式：日班 (點此切換夜班)";
       }
-    }
-
-    function toggleForceLandscape() {
-      document.body.classList.toggle("force-landscape");
     }
 
     function getSelectedVendor() {
@@ -867,6 +862,9 @@
         return;
       }
 
+      // 啟動重力方向感應器 (支援 iOS 與 Android 鎖定螢幕方向時自動判別橫拍/直拍)
+      initOrientationSensor();
+
       if (isCustomSelected) {
         pushNewVendorToCloud(vendor);
       } else if (currentPhotoType === "WORKER") {
@@ -884,15 +882,10 @@
         document.getElementById("shootingVendorTitle").innerText = `👷 ${vendor} (${shiftStr})`;
       }
       updateShootingUI();
+      updatePoseBadgeUI();
 
       document.getElementById("pageSelectVendor").style.display = "none";
       document.getElementById("pageShooting").style.display = "flex";
-
-      try {
-        if (screen.orientation && screen.orientation.lock) {
-          screen.orientation.lock("landscape").catch(() => {});
-        }
-      } catch (e) {}
 
       try {
         if (!videoStream) {
@@ -908,7 +901,6 @@
     }
 
     function finishGroupAndReturn() {
-      document.body.classList.remove("force-landscape");
       currentGroupShots = 0;
       groupBaseEpochMs = null;
       document.getElementById("pageShooting").style.display = "none";
@@ -990,30 +982,80 @@
       ctx.fillText(dateStr, boxX1 + padX, boxY1 + boxH / 2);
     }
 
-    function drawSourceAsLandscape4x3(sourceEl, srcW, srcH) {
+    // 🌟 核心影像方向轉正與裁切引擎 (支援鎖定螢幕方向橫拍、無鎖定橫拍、直拍保留直式)
+    function captureAndOrientPhoto(sourceEl, srcW, srcH, isFromGallery) {
+      const orientCanvas = document.getElementById("orientCanvas");
+      const oCtx = orientCanvas.getContext("2d");
+
+      let rotDeg = 0;
+
+      if (!isFromGallery) {
+        const pose = getEffectivePose();
+        const isStreamPortrait = (srcH > srcW);
+
+        if (pose === "LANDSCAPE_LEFT") {
+          // 手機橫拿(頂部朝左、右手按快門)：若系統鎖定直向導致影像為直立(srcH > srcW)，需逆時針轉正 90 度 (-90)
+          // 若系統未鎖定方向、影像本身已是橫向(srcW > srcH)，則為 0 度不重複旋轉
+          rotDeg = isStreamPortrait ? -90 : 0;
+        } else if (pose === "LANDSCAPE_RIGHT") {
+          // 手機橫拿(頂部朝右、左手按快門)：若系統鎖定直向導致影像為直立，需順時針轉正 90 度 (+90)
+          rotDeg = isStreamPortrait ? 90 : 0;
+        } else {
+          // 手機直拿拍攝 (PORTRAIT)：保持直立方向不旋轉
+          rotDeg = 0;
+        }
+      }
+
+      if (rotDeg === -90) {
+        orientCanvas.width = srcH;
+        orientCanvas.height = srcW;
+        oCtx.save();
+        oCtx.translate(0, srcW);
+        oCtx.rotate(-Math.PI / 2);
+        oCtx.drawImage(sourceEl, 0, 0, srcW, srcH);
+        oCtx.restore();
+      } else if (rotDeg === 90) {
+        orientCanvas.width = srcH;
+        orientCanvas.height = srcW;
+        oCtx.save();
+        oCtx.translate(srcH, 0);
+        oCtx.rotate(Math.PI / 2);
+        oCtx.drawImage(sourceEl, 0, 0, srcW, srcH);
+        oCtx.restore();
+      } else {
+        orientCanvas.width = srcW;
+        orientCanvas.height = srcH;
+        oCtx.drawImage(sourceEl, 0, 0, srcW, srcH);
+      }
+
+      const upW = orientCanvas.width;
+      const upH = orientCanvas.height;
+      const isPortraitPhoto = (upH > upW);
+
+      // 橫拍輸出 1440x1080 (4:3 橫式)；直拍保留直式輸出 1080x1440 (3:4 直式)
+      const outW = isPortraitPhoto ? 1080 : 1440;
+      const outH = isPortraitPhoto ? 1440 : 1080;
+      const targetRatio = outW / outH;
+
       const canvas = document.getElementById("watermarkCanvas");
       const ctx = canvas.getContext("2d");
-
-      const targetRatio = 4 / 3;
-      const outW = 1440;
-      const outH = 1080;
       canvas.width = outW;
       canvas.height = outH;
 
       let cropW, cropH, cropX, cropY;
-      if (srcW / srcH > targetRatio) {
-        cropH = srcH;
-        cropW = Math.round(srcH * targetRatio);
-        cropX = Math.round((srcW - cropW) / 2);
+      if (upW / upH > targetRatio) {
+        cropH = upH;
+        cropW = Math.round(upH * targetRatio);
+        cropX = Math.round((upW - cropW) / 2);
         cropY = 0;
       } else {
-        cropW = srcW;
-        cropH = Math.round(srcW / targetRatio);
+        cropW = upW;
+        cropH = Math.round(upW / targetRatio);
         cropX = 0;
-        cropY = Math.round((srcH - cropH) / 2);
+        cropY = Math.round((upH - cropH) / 2);
       }
 
-      ctx.drawImage(sourceEl, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
+      ctx.drawImage(orientCanvas, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
       drawTimestampOnCanvas(ctx, outW, outH);
       return canvas.toDataURL("image/jpeg", 0.92);
     }
@@ -1029,7 +1071,7 @@
       flash.style.opacity = "0.85";
       setTimeout(() => { flash.style.opacity = "0"; }, 100);
 
-      const rawJpegBase64 = drawSourceAsLandscape4x3(video, video.videoWidth, video.videoHeight);
+      const rawJpegBase64 = captureAndOrientPhoto(video, video.videoWidth, video.videoHeight, false);
       queueUpload(rawJpegBase64);
     }
 
@@ -1115,7 +1157,7 @@
         reader.onload = function(e) {
           const img = new Image();
           img.onload = function() {
-            const rawJpegBase64 = drawSourceAsLandscape4x3(img, img.width, img.height);
+            const rawJpegBase64 = captureAndOrientPhoto(img, img.width, img.height, true);
             queueUpload(rawJpegBase64);
           };
           img.src = e.target.result;
