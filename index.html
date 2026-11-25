@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <title>旺邦營造 · 現場出工與鼠患稽查連拍</title>
-  <!-- 載入輕量 EXIF 寫入工具，讓網頁拍出的照片擁有真實相機 EXIF (DateTimeOriginal) -->
+  <!-- 載入輕量 EXIF 讀寫工具，讓網頁拍出與相簿上傳的照片都保有真實相機 EXIF (DateTimeOriginal) -->
   <script src="https://cdn.jsdelivr.net/npm/piexifjs@1.0.6/piexif.min.js"></script>
   <style>
     :root, html, body {
@@ -485,7 +485,7 @@
           <div id="thumbStrip" class="thumb-strip">
             <span class="thumb-empty-hint">📷 按下方橘色圓鈕連拍</span>
           </div>
-          <div id="statusBox" class="status-box">🟢 自動壓印日期＋EXIF</div>
+          <div id="statusBox" class="status-box">🟢 真實時間＋EXIF</div>
         </div>
 
         <!-- 🟧＋🟩【底部控制區】：綠框返回Icon ＋ 橘框亮橘圓形快門 ＋ 方向切換 (小於 1/5) -->
@@ -543,14 +543,15 @@
     let currentPhotoType = "WORKER"; // "WORKER" (工班) 或 "RAT" (鼠患)
     let isNightMode = false;
     let currentGroupShots = 0;
-    let groupBaseEpochMs = null;
     let activeUploads = 0;
     let videoStream = null;
+
+    // 記錄本次頁面已發出過的時間字串 (YYYYMMDD_HHMMSS)，僅在同一秒內極速連按 2 張時防撞名 (+1秒)
+    const usedTimeStrSet = new Set();
 
     // 🌟 智慧照片方向偵測與控制狀態
     // photoPoseMode: "AUTO" (自動重力感應) | "LANDSCAPE_LEFT" (橫拿頂朝左) | "PORTRAIT" (直拿) | "LANDSCAPE_RIGHT" (橫拿頂朝右)
     let photoPoseMode = "AUTO";
-    // 當處於 AUTO 模式時，重力感應器即時判別出的握持姿勢 (若瀏覽器阻擋感應器，預設為最常見的 LANDSCAPE_LEFT)
     let detectedPhysicalPose = "LANDSCAPE_LEFT";
     let orientationListenerInitialized = false;
 
@@ -596,19 +597,15 @@
         const radBeta = e.beta * (Math.PI / 180);
         const radGamma = e.gamma * (Math.PI / 180);
 
-        // 計算重力在手機螢幕平面上的分量 (gx: 左右軸, gy: 上下軸)，無懼超過90度翻轉
         const gx = -Math.cos(radBeta) * Math.sin(radGamma);
         const gy = -Math.sin(radBeta);
 
-        // 若手機平放桌面 (傾斜太小)，維持上一個有效姿勢
         if (Math.abs(gx) < 0.30 && Math.abs(gy) < 0.30) return;
 
         let newPose = detectedPhysicalPose;
         if (Math.abs(gx) > Math.abs(gy) * 1.15) {
-          // 橫拿：gx > 0 代表手機頂部朝左(右手按快門)；gx < 0 代表手機頂部朝右(左手按快門)
           newPose = (gx > 0) ? "LANDSCAPE_LEFT" : "LANDSCAPE_RIGHT";
         } else if (Math.abs(gy) > Math.abs(gx) * 1.15) {
-          // 直拿手機
           newPose = "PORTRAIT";
         }
 
@@ -862,7 +859,6 @@
         return;
       }
 
-      // 啟動重力方向感應器 (支援 iOS 與 Android 鎖定螢幕方向時自動判別橫拍/直拍)
       initOrientationSensor();
 
       if (isCustomSelected) {
@@ -872,7 +868,6 @@
       }
 
       currentGroupShots = 0;
-      groupBaseEpochMs = Date.now();
       document.getElementById("thumbStrip").innerHTML = '<span class="thumb-empty-hint">📷 按下方橘色圓鈕連拍</span>';
 
       if (currentPhotoType === "RAT") {
@@ -902,7 +897,6 @@
 
     function finishGroupAndReturn() {
       currentGroupShots = 0;
-      groupBaseEpochMs = null;
       document.getElementById("pageShooting").style.display = "none";
       document.getElementById("pageSelectVendor").style.display = "block";
       syncVendorsFromCloud();
@@ -912,6 +906,7 @@
       document.getElementById("shotCounterText").innerText = `📸 已拍 ${currentGroupShots} 張`;
     }
 
+    // ================= [真實時間處理、相簿原圖 EXIF 讀取與防撞名] =================
     function formatTaiwanTimeStr(epochMs) {
       const twDate = new Date(epochMs + (8 * 3600 * 1000));
       const yyyy = twDate.getUTCFullYear();
@@ -921,6 +916,55 @@
       const min = String(twDate.getUTCMinutes()).padStart(2, '0');
       const ss = String(twDate.getUTCSeconds()).padStart(2, '0');
       return `${yyyy}${mm}${dd}_${hh}${min}${ss}`;
+    }
+
+    function formatTaiwanWatermarkDate(epochMs) {
+      const twDate = new Date(epochMs + (8 * 3600 * 1000));
+      const yyyy = twDate.getUTCFullYear();
+      const mm = String(twDate.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(twDate.getUTCDate()).padStart(2, '0');
+      return `${yyyy}/${mm}/${dd}`;
+    }
+
+    // 以真實時間為基準，僅在「同一秒內重複撞名」時才遞增 +1 秒，不再強迫跨組鎖死連號
+    function allocateUniqueEpochMs(baseEpochMs) {
+      let ep = (typeof baseEpochMs === "number" && !isNaN(baseEpochMs) && baseEpochMs > 0) ? baseEpochMs : Date.now();
+      while (usedTimeStrSet.has(formatTaiwanTimeStr(ep))) {
+        ep += 1000;
+      }
+      usedTimeStrSet.add(formatTaiwanTimeStr(ep));
+      return ep;
+    }
+
+    // 從相簿選取的原圖 DataURL 中優先讀取真實 EXIF (DateTimeOriginal)，讀不到才退回檔案修改時間
+    function extractOriginalEpochFromDataUrl(dataUrl, fallbackEpochMs) {
+      try {
+        if (typeof piexif !== "undefined" && typeof dataUrl === "string" &&
+            (dataUrl.indexOf("data:image/jpeg") === 0 || dataUrl.indexOf("data:image/jpg") === 0)) {
+          const exifObj = piexif.load(dataUrl);
+          const rawDt =
+            (exifObj && exifObj["Exif"] && exifObj["Exif"][piexif.ExifIFD.DateTimeOriginal]) ||
+            (exifObj && exifObj["Exif"] && exifObj["Exif"][piexif.ExifIFD.DateTimeDigitized]) ||
+            (exifObj && exifObj["0th"] && exifObj["0th"][piexif.ImageIFD.DateTime]);
+          if (rawDt) {
+            const m = String(rawDt).trim().match(/^(\d{4}):(\d{2}):(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/);
+            if (m) {
+              const y = parseInt(m[1], 10);
+              const mo = parseInt(m[2], 10);
+              const d = parseInt(m[3], 10);
+              const hh = parseInt(m[4], 10);
+              const mm = parseInt(m[5], 10);
+              const ss = parseInt(m[6], 10);
+              if (y >= 2020 && y <= 2035 && mo >= 1 && mo <= 12 && d >= 1 && d <= 31) {
+                return Date.UTC(y, mo - 1, d, hh, mm, ss) - (8 * 3600 * 1000);
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("原圖 EXIF 讀取略過:", e);
+      }
+      return (typeof fallbackEpochMs === "number" && fallbackEpochMs > 0) ? fallbackEpochMs : Date.now();
     }
 
     // 🌟 將台灣拍攝時間寫入 JPG 檔案底層的 EXIF (DateTimeOriginal) 標籤中
@@ -954,12 +998,8 @@
       }
     }
 
-    function drawTimestampOnCanvas(ctx, w, h) {
-      const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth() + 1).padStart(2, '0');
-      const dd = String(now.getDate()).padStart(2, '0');
-      const dateStr = `${yyyy}/${mm}/${dd}`;
+    function drawTimestampOnCanvas(ctx, w, h, epochMs) {
+      const dateStr = formatTaiwanWatermarkDate(epochMs || Date.now());
 
       const targetBoxH = Math.max(24, Math.floor(h * 0.05));
       const fontSize = Math.max(14, Math.floor(targetBoxH * 0.72));
@@ -983,7 +1023,7 @@
     }
 
     // 🌟 核心影像方向轉正與裁切引擎 (支援鎖定螢幕方向橫拍、無鎖定橫拍、直拍保留直式)
-    function captureAndOrientPhoto(sourceEl, srcW, srcH, isFromGallery) {
+    function captureAndOrientPhoto(sourceEl, srcW, srcH, isFromGallery, shotEpochMs) {
       const orientCanvas = document.getElementById("orientCanvas");
       const oCtx = orientCanvas.getContext("2d");
 
@@ -994,14 +1034,10 @@
         const isStreamPortrait = (srcH > srcW);
 
         if (pose === "LANDSCAPE_LEFT") {
-          // 手機橫拿(頂部朝左、右手按快門)：若系統鎖定直向導致影像為直立(srcH > srcW)，需逆時針轉正 90 度 (-90)
-          // 若系統未鎖定方向、影像本身已是橫向(srcW > srcH)，則為 0 度不重複旋轉
           rotDeg = isStreamPortrait ? -90 : 0;
         } else if (pose === "LANDSCAPE_RIGHT") {
-          // 手機橫拿(頂部朝右、左手按快門)：若系統鎖定直向導致影像為直立，需順時針轉正 90 度 (+90)
           rotDeg = isStreamPortrait ? 90 : 0;
         } else {
-          // 手機直拿拍攝 (PORTRAIT)：保持直立方向不旋轉
           rotDeg = 0;
         }
       }
@@ -1032,7 +1068,6 @@
       const upH = orientCanvas.height;
       const isPortraitPhoto = (upH > upW);
 
-      // 橫拍輸出 1440x1080 (4:3 橫式)；直拍保留直式輸出 1080x1440 (3:4 直式)
       const outW = isPortraitPhoto ? 1080 : 1440;
       const outH = isPortraitPhoto ? 1440 : 1080;
       const targetRatio = outW / outH;
@@ -1056,7 +1091,7 @@
       }
 
       ctx.drawImage(orientCanvas, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
-      drawTimestampOnCanvas(ctx, outW, outH);
+      drawTimestampOnCanvas(ctx, outW, outH, shotEpochMs);
       return canvas.toDataURL("image/jpeg", 0.92);
     }
 
@@ -1071,8 +1106,10 @@
       flash.style.opacity = "0.85";
       setTimeout(() => { flash.style.opacity = "0"; }, 100);
 
-      const rawJpegBase64 = captureAndOrientPhoto(video, video.videoWidth, video.videoHeight, false);
-      queueUpload(rawJpegBase64);
+      // 採用當下真實拍攝時間（同秒連按才微調 +1 秒防重複）
+      const shotEpochMs = allocateUniqueEpochMs(Date.now());
+      const rawJpegBase64 = captureAndOrientPhoto(video, video.videoWidth, video.videoHeight, false, shotEpochMs);
+      queueUpload(rawJpegBase64, shotEpochMs);
     }
 
     function updateStatusDisplay(msg) {
@@ -1085,19 +1122,19 @@
       }
     }
 
-    function queueUpload(rawJpegBase64) {
+    function queueUpload(rawJpegBase64, shotEpochMs) {
       const vendor = getSelectedVendor();
       const pType = currentPhotoType;
 
-      if (!groupBaseEpochMs) groupBaseEpochMs = Date.now();
       currentGroupShots++;
       const shotNum = currentGroupShots;
 
-      // 計算本張照片的鎖定時間毫秒數，並同時用於「檔名」與「EXIF 內部拍攝時間」
-      const shotEpochMs = (pType === "WORKER") ? (groupBaseEpochMs + (shotNum - 1) * 1000) : (Date.now() + shotNum * 100);
-      const lockedTimeStr = formatTaiwanTimeStr(shotEpochMs);
+      const finalEpochMs = (typeof shotEpochMs === "number" && shotEpochMs > 0)
+        ? shotEpochMs
+        : allocateUniqueEpochMs(Date.now());
+      const timeStr = formatTaiwanTimeStr(finalEpochMs);
 
-      const watermarkedWithExifBase64 = injectExifDateTime(rawJpegBase64, shotEpochMs);
+      const watermarkedWithExifBase64 = injectExifDateTime(rawJpegBase64, finalEpochMs);
 
       updateShootingUI();
 
@@ -1120,7 +1157,7 @@
           base64Data: watermarkedWithExifBase64,
           vendorName: vendor,
           isNight: isNightMode,
-          customTimeStr: lockedTimeStr,
+          customTimeStr: timeStr,
           photoType: pType
         })
       })
@@ -1150,17 +1187,21 @@
       if (!files || files.length === 0) return;
       const fileList = Array.from(files);
       document.getElementById("galleryInput").value = "";
-      groupBaseEpochMs = Date.now();
 
       fileList.forEach(file => {
         const reader = new FileReader();
         reader.onload = function(e) {
+          const dataUrl = e.target.result;
+          // 先讀取原圖真實 EXIF 拍攝時間（讀不到才退回檔案修改時間），再防撞名
+          const origEpochMs = extractOriginalEpochFromDataUrl(dataUrl, file.lastModified);
+          const shotEpochMs = allocateUniqueEpochMs(origEpochMs);
+
           const img = new Image();
           img.onload = function() {
-            const rawJpegBase64 = captureAndOrientPhoto(img, img.width, img.height, true);
-            queueUpload(rawJpegBase64);
+            const rawJpegBase64 = captureAndOrientPhoto(img, img.width, img.height, true, shotEpochMs);
+            queueUpload(rawJpegBase64, shotEpochMs);
           };
-          img.src = e.target.result;
+          img.src = dataUrl;
         };
         reader.readAsDataURL(file);
       });
