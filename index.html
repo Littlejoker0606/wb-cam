@@ -123,7 +123,7 @@
 
     input[type="file"] { display: none; }
 
-    /* ================= 【第二頁：最大化取景窗全螢幕相機 (固定直式UI · 原生4:3 · 多鏡頭)】 ================= */
+    /* ================= 【第二頁：最大化取景窗全螢幕相機 (直式 / 橫式自動適配 · 原生4:3 · 多鏡頭)】 ================= */
     #pageShooting {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -144,11 +144,12 @@
       height: 100%;
     }
 
-    /* 🟥【取景窗最大化】：佔全螢幕約 79%~80%，所見即所得原比例 (contain) */
+    /* 🟥【取景窗最大化】：直式佔約 80%，橫式吃滿 100% 螢幕全高 */
     .camera-left-col {
       flex: 1;
       width: 100%;
       min-height: 0;
+      min-width: 0;
       position: relative;
       background: #101311;
       display: flex;
@@ -257,7 +258,7 @@
       border: 1px solid rgba(255, 255, 255, 0.25);
     }
 
-    /* 下半部緊湊控制群組 (合計僅約 20%~21%，讓取景窗空間最大化) */
+    /* 控制群組 (直式在下方，橫式自動切換至右側直排) */
     .controls-right-col {
       width: 100%;
       display: flex;
@@ -289,6 +290,7 @@
       align-items: center;
       gap: 5px;
       overflow-x: auto;
+      overflow-y: hidden;
       height: 100%;
       flex: 1;
       min-width: 0;
@@ -328,7 +330,7 @@
       flex-shrink: 0;
     }
 
-    /* 🟧＋🟩【底部控制區】：精簡高度保留充裕點按面積 */
+    /* 🟧＋🟩【操作控制列】：直式置底，橫式自動切換為最右側直排 */
     .bottom-control-bar {
       width: 100%;
       height: 13dvh;
@@ -428,6 +430,106 @@
       box-shadow: 0 3px 8px rgba(126, 182, 217, 0.22);
       transition: transform 0.1s;
     }
+
+    /* ================= 【橫式原生相機自動適配：開啟自動旋轉並打橫時觸發】 ================= */
+    @media (orientation: landscape) {
+      body {
+        justify-content: flex-start;
+      }
+
+      .shooting-layout {
+        flex-direction: row;
+      }
+
+      .camera-left-col {
+        width: auto;
+        height: 100%;
+      }
+
+      .floating-top-bar {
+        top: 8px;
+        left: max(10px, env(safe-area-inset-left));
+        right: 10px;
+      }
+
+      .lens-circle-btn {
+        bottom: 10px;
+        left: max(12px, env(safe-area-inset-left));
+      }
+
+      .controls-right-col {
+        width: auto;
+        height: 100%;
+        flex-direction: row;
+      }
+
+      .blue-info-strip {
+        width: 62px;
+        height: 100%;
+        min-height: 0;
+        max-height: none;
+        padding: 8px 4px;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        gap: 6px;
+        border-top: none;
+        border-bottom: none;
+        border-left: 1.5px solid #D5E6D7;
+        border-right: 1.5px solid #E4EDE5;
+      }
+
+      .thumb-strip {
+        flex-direction: column;
+        overflow-x: hidden;
+        overflow-y: auto;
+        width: 100%;
+        height: auto;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .thumb-empty-hint {
+        font-size: 10px;
+        white-space: normal;
+        text-align: center;
+        line-height: 1.3;
+      }
+
+      .thumb-item {
+        width: 50px;
+        height: 38px;
+        max-width: 50px;
+      }
+
+      .status-box {
+        max-width: 100%;
+        width: 54px;
+        font-size: 9px;
+        text-align: center;
+        padding: 4px 2px;
+        white-space: normal;
+        word-break: break-all;
+        line-height: 1.2;
+      }
+
+      /* 右側直排操作列：上=自動方向、中=亮橘色大快門、下=返回首頁 */
+      .bottom-control-bar {
+        width: auto;
+        min-width: 84px;
+        height: 100%;
+        min-height: 0;
+        max-height: none;
+        padding: 12px calc(10px + env(safe-area-inset-right)) 12px 10px;
+        flex-direction: column-reverse;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .side-action-wrap {
+        width: 64px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -493,7 +595,7 @@
   <!-- ================= 【第二頁：最大化取景窗連拍介面】 ================= -->
   <div id="pageShooting">
     <div class="shooting-layout">
-      <!-- 🟥 取景窗最大化區域 (約 80%) -->
+      <!-- 🟥 取景窗最大化區域 -->
       <div class="camera-left-col">
         <div id="cameraContainer">
           <div class="floating-top-bar">
@@ -511,11 +613,11 @@
         </div>
       </div>
 
-      <!-- 下半部精簡控制群組 (約 20%) -->
+      <!-- 控制群組 (直式在下方，橫式自動切換為右側直排) -->
       <div id="controlsRightCol" class="controls-right-col">
         <div id="blueInfoStrip" class="blue-info-strip">
           <div id="thumbStrip" class="thumb-strip">
-            <span class="thumb-empty-hint">📷 按橘色快門連拍</span>
+            <span class="thumb-empty-hint">📷 按快門連拍</span>
           </div>
           <div id="statusBox" class="status-box">🟢 真實時間＋4:3廣角</div>
         </div>
@@ -631,7 +733,6 @@
     }
 
     async function openCameraStream(deviceId) {
-      // 優先請求原生 4:3 感測器比例，解除 16:9->4:3 雙重裁切放大，讓視野立即增廣
       const primaryVideo = {
         width: { ideal: 1600 },
         height: { ideal: 1200 },
@@ -646,7 +747,6 @@
       try {
         return await navigator.mediaDevices.getUserMedia({ video: primaryVideo, audio: false });
       } catch (e1) {
-        // 若該鏡頭不接受 4:3 / 1600x1200 條件，安全退回基本約束確保絕不黑畫面
         const fallbackVideo = deviceId
           ? { deviceId: { exact: deviceId } }
           : { facingMode: { ideal: "environment" } };
@@ -744,12 +844,10 @@
 
       const lenses = [];
 
-      // 1. 優先放入實體超廣角 (iPhone Back Ultra Wide Camera / 標示超廣角的 Android 鏡頭)
       if (ultraList.length > 0) {
         lenses.push(ultraList[0]);
       }
 
-      // 2. 若硬體主鏡頭開放原生光學縮放 zoom < 0.95 (部分 Android Chrome 支援 0.5x/0.6x)
       if (ultraList.length === 0 && activeCaps && activeCaps.zoom && typeof activeCaps.zoom.min === "number" && activeCaps.zoom.min < 0.95) {
         const minZ = Math.max(0.5, Math.round(activeCaps.zoom.min * 10) / 10);
         lenses.push({
@@ -762,7 +860,6 @@
         });
       }
 
-      // 3. 放入標準 1x 主鏡頭
       if (mainList.length > 0) {
         const activeMain = mainList.find(m => m.deviceId === activeDeviceId) || mainList[0];
         lenses.push(activeMain);
@@ -776,7 +873,6 @@
         });
       }
 
-      // 4. 若尚未找到明確標示超廣角的鏡頭（常見於 Android 顯示 camera2 2 / camera2 3），把其他後置實體鏡頭一併列出供一鍵切換
       if (ultraList.length === 0 && otherRearList.length > 0) {
         let extraNum = 2;
         otherRearList.forEach(item => {
@@ -788,7 +884,6 @@
         });
       }
 
-      // 最後保底至少有一顆 1x
       if (lenses.length === 0) {
         lenses.push({
           kind: "device",
@@ -802,11 +897,9 @@
       availableLenses = lenses;
       lensesDiscovered = true;
 
-      // 標記目前正在運作的是清單中哪一顆
       const activeIdx = availableLenses.findIndex(l => l.kind === "device" && l.deviceId === activeDeviceId);
       currentLensIdx = (activeIdx >= 0) ? activeIdx : 0;
 
-      // 🌟 依需求：預設優先切換至 0.5x 超廣角；若 Android 無超廣角標籤，則自動套用上次使用者選過的後置鏡頭
       const ultraIdx = availableLenses.findIndex(l => l.isUltraWide);
       let targetIdx = currentLensIdx;
 
@@ -826,7 +919,7 @@
         updateLensButtonUI();
         const cur = availableLenses[currentLensIdx];
         if (cur) {
-          updateStatusDisplay(`🔭 ${cur.shortLabel}｜共 ${availableLenses.length} 顆後置鏡頭`);
+          updateStatusDisplay(`🔭 ${cur.shortLabel}｜共 ${availableLenses.length} 顆鏡頭`);
         }
       }
     }
@@ -854,7 +947,6 @@
         } else {
           const prevTrack = videoStream ? videoStream.getVideoTracks()[0] : null;
           const prevSettings = (prevTrack && typeof prevTrack.getSettings === "function") ? prevTrack.getSettings() : {};
-          // 若同一個 deviceId 且剛從 zoom 切回 1x，直接把 zoom 還原 1.0 零閃爍
           if (prevTrack && prevTrack.readyState === "live" && prevSettings.deviceId === target.deviceId) {
             const caps = (typeof prevTrack.getCapabilities === "function") ? prevTrack.getCapabilities() : {};
             if (caps && caps.zoom) {
@@ -864,7 +956,6 @@
             }
             currentLensIdx = targetIdx;
           } else {
-            // 先安全關閉舊串流，避免 iOS / Android 相機鎖死黑畫面
             stopCurrentStream();
             const newStream = await openCameraStream(target.deviceId);
             attachStreamToVideo(newStream);
@@ -891,7 +982,7 @@
           } catch (e2) {}
         }
         updateLensButtonUI();
-        updateStatusDisplay("⚠️ 此鏡頭不支援，已維持原鏡頭");
+        updateStatusDisplay("⚠️ 已維持原鏡頭");
       } finally {
         isSwitchingLens = false;
       }
@@ -900,7 +991,7 @@
     function cycleCameraLens() {
       if (isSwitchingLens) return;
       if (availableLenses.length <= 1) {
-        updateStatusDisplay("ℹ️ 此瀏覽器僅開放 1 顆後置鏡頭 (已啟用4:3寬視野)");
+        updateStatusDisplay("ℹ️ 僅開放 1 顆後置鏡頭 (4:3寬視野)");
         return;
       }
       const nextIdx = (currentLensIdx + 1) % availableLenses.length;
@@ -1187,7 +1278,7 @@
       }
 
       currentGroupShots = 0;
-      document.getElementById("thumbStrip").innerHTML = '<span class="thumb-empty-hint">📷 按橘色快門連拍</span>';
+      document.getElementById("thumbStrip").innerHTML = '<span class="thumb-empty-hint">📷 按快門連拍</span>';
 
       if (currentPhotoType === "RAT") {
         document.getElementById("shootingVendorTitle").innerText = "🐭 鼠患防治檢查";
@@ -1466,6 +1557,7 @@
       thumb.src = watermarkedWithExifBase64;
       thumbStrip.appendChild(thumb);
       thumbStrip.scrollLeft = thumbStrip.scrollWidth;
+      thumbStrip.scrollTop = thumbStrip.scrollHeight;
 
       activeUploads++;
       updateStatusDisplay(`⏳ 上傳中 (尚有 ${activeUploads} 張)...`);
